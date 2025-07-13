@@ -1,0 +1,175 @@
+﻿<div class="chat-container">
+    <div class="chat-header">Chats</div>
+
+    <div class="chat-messages" id="chat-messages">
+        <div class="message-info">Operation Centre, 13:14</div>
+        <div class="message message-bot">
+            Hello John, unfortunately, we don't have that model in stock right now. A new order has been placed for it.
+            <span class="message-time">13:14</span>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="message message-user">
+            Hi, I've checked the installation and found that the check valve is cracked. We'll need a new one. The model is V-00025314
+            <span class="message-time">13:15</span>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="message message-user">
+            Do you know when the order will arrive?
+            <span class="message-time">13:15</span>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="message-info">Operation Centre, 13:16</div>
+        <div class="message message-bot">
+            The new check valve is expected to arrive in about a week.
+            <span class="message-time">13:16</span>
+        </div>
+        <div class="clearfix"></div>
+
+        <div class="message message-user">
+            Got it, thanks. I'll open a new work order for a week from now.
+            <span class="message-time">13:17</span>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="chat-input">
+        <button class="attachment-button">
+            <i class="material-icons">attach_file</i>
+        </button>
+        <input type="text" id="message-input" placeholder="Type a message">
+        <button class="send-button" id="send-button">
+            <i class="material-icons" style="color: white;">send</i>
+        </button>
+    </div>
+</div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatMessages = document.getElementById('chat-messages');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+
+        // Predefined responses from the chatbot
+        const botResponses = [
+            "I've noted your request and will process it right away.",
+            "According to our system, the part should be available next week.",
+            "I'll create a work order for this issue right away.",
+            "Would you like me to schedule a follow-up inspection?",
+            "The maintenance team has been notified and will address this soon.",
+            "I can see that part is currently on backorder. I'll expedite the request.",
+            "According to our database, the warranty on that part is still valid.",
+            "I've checked the inventory and we have that component in stock.",
+            "Your request has been escalated to the senior maintenance team.",
+            "I've updated your case in our system with the new information."
+        ];
+
+        // Add current date/time to messages
+        function getCurrentTime() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        // Add user message to chat
+        function addUserMessage(message) {
+            const div = document.createElement('div');
+            div.className = 'message message-user';
+            div.innerHTML = `
+                ${message}
+                <span class="message-time">${getCurrentTime()}</span>
+            `;
+            chatMessages.appendChild(div);
+
+            const clearfix = document.createElement('div');
+            clearfix.className = 'clearfix';
+            chatMessages.appendChild(clearfix);
+
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Add bot message to chat
+        function addBotMessage(message) {
+            // Add "Operation Centre" label
+            const infoDiv = document.createElement('div');
+            infoDiv.className = 'message-info';
+            infoDiv.textContent = `Operation Centre, ${getCurrentTime()}`;
+            chatMessages.appendChild(infoDiv);
+
+            // Add the message
+            const div = document.createElement('div');
+            div.className = 'message message-bot';
+            div.innerHTML = `
+                ${message}
+                <span class="message-time">${getCurrentTime()}</span>
+            `;
+            chatMessages.appendChild(div);
+
+            const clearfix = document.createElement('div');
+            clearfix.className = 'clearfix';
+            chatMessages.appendChild(clearfix);
+
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Handle send button click
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message) {
+                // Add user message
+                addUserMessage(message);
+                messageInput.value = '';
+
+                // Simulate typing delay before bot responds
+                setTimeout(() => {
+                    // Simple AI: First try to respond contextually based on keywords
+                    let botResponse;
+
+                    if (message.toLowerCase().includes('hello') || message.toLowerCase().includes('hi')) {
+                        botResponse = "Hello! How can I assist you today with your maintenance request?";
+                    }
+                    else if (message.toLowerCase().includes('help')) {
+                        botResponse = "I'm here to help! Please describe the issue you're experiencing, and I'll assist you in finding a solution.";
+                    }
+                    else if (message.toLowerCase().includes('broken') || message.toLowerCase().includes('damaged') || message.toLowerCase().includes('fault')) {
+                        botResponse = "I understand you're reporting a damaged component. Could you provide the specific model number and location?";
+                    }
+                    else if (message.toLowerCase().includes('order') || message.toLowerCase().includes('delivery')) {
+                        botResponse = "I've checked your order status. The parts are scheduled for delivery next Tuesday.";
+                    }
+                    else if (message.toLowerCase().includes('schedule') || message.toLowerCase().includes('appointment')) {
+                        botResponse = "I can help you schedule a maintenance visit. What date and time works best for you?";
+                    }
+                    else if (message.toLowerCase().includes('thanks') || message.toLowerCase().includes('thank you')) {
+                        botResponse = "You're welcome! Is there anything else I can assist you with today?";
+                    }
+                    else {
+                        // If no contextual response, pick a random one
+                        botResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
+                    }
+
+                    // Add bot response
+                    addBotMessage(botResponse);
+                }, 1000);
+            }
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Set focus to input field
+        messageInput.focus();
+    });
+</script>

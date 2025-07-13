@@ -1,0 +1,32 @@
+﻿@model IEnumerable<Capstone_Next_Step.Models.Asset>
+
+<h4 class="section-title">Assets Lists</h4>
+@foreach(var ProductList in Model)
+{
+<div class="asset-card">
+    <div class="d-flex justify-content-between align-items-start">
+        <div class="asset-info">
+            <div class="asset-name">@ProductList.Name</div>
+                <div class="asset-location">@ProductList.Location</div>
+        </div>
+            <span class="status-badge status-pending">@ProductList.Status</span>
+    </div>
+    <div class="asset-meta">
+        <span class="asset-meta-date">
+            <i class="far fa-calendar"></i> @ProductList.date
+        </span>
+            <span class="asset-meta-user">
+                @ProductList.UserId
+            <i class="far fa-user"></i> 
+        </span>
+    </div>
+</div>
+
+}
+
+<div class="text-center mt-4 d-flex gap-2">
+    <form action="AddAsset" class="col-auto" method="post">
+        <button  type="submit" class="btn btn-primary mr-2" >Add Assets</button>
+    </form>
+   
+</div>

@@ -1,0 +1,98 @@
+﻿<div class="form-container">
+    <h4 class="mb-4">Add Product</h4>
+    <form action="/Asset/AddProductForm">
+        <!-- Image URL Input Area -->
+        <div class="mb-3">
+            <input name="ImageUrl" type="text" class="form-control" id="imageUrl" placeholder="Image URL" required>
+            <div class="error-message" id="url-error"></div>
+        </div>
+
+        <div class="mb-3">
+            <input name="Name" type="text" class="form-control" id="name" placeholder="Name" required>
+        </div>
+        <div class="mb-3">
+            <input name="Category" type="text" class="form-control" id="category" placeholder="Category" required>
+        </div>
+        <div class="mb-3">
+            <input name="Count" type="number" class="form-control" id="count" placeholder="Count" required>
+        </div>
+        <div class="mb-3">
+            <input name="Type" type="text" class="form-control" id="type" placeholder="Type" required>
+        </div>
+        <div class="mb-3">
+            <input name="Color" type="text" class="form-control" id="color" placeholder="Color" required>
+        </div>
+        <div class="mb-4">
+            <input name="Price" type="number" class="form-control" id="price" placeholder="Price" required>
+        </div>
+
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Add</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('itemForm');
+        const imageUrlInput = document.getElementById('imageUrl');
+        const urlError = document.getElementById('url-error');
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validate image URL
+            const imageUrl = imageUrlInput.value.trim();
+            if (!isValidUrl(imageUrl)) {
+                showError('Please enter a valid image URL');
+                return;
+            }
+
+            // Here you would typically submit the form data
+            const formData = new FormData(form);
+
+            // Example fetch request (uncomment and modify as needed)
+            /*
+            fetch('your-backend-endpoint', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                // Handle success (e.g., show success message, reset form)
+                form.reset();
+                imageUrlInput.value = '';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Handle error
+            });
+            */
+
+            // For demo purposes, just log the form data
+            console.log('Form submitted!');
+            for (let [key, value] of formData.entries()) {
+                console.log(key, value);
+            }
+
+            // Comment out the alert for production use
+            alert('Product added successfully!');
+
+            // Reset form
+            form.reset();
+            imageUrlInput.value = '';
+        });
+
+        function showError(message) {
+            urlError.textContent = message;
+            urlError.style.display = 'block';
+        }
+
+        function isValidUrl(string) {
+            const res = string.match(/(https?:\/\/[^\s]+)/g);
+            return (res !== null);
+        }
+    });
+</script>

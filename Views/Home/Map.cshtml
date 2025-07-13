@@ -1,0 +1,35 @@
+﻿
+    <h2>Asset Locations on the Map</h2>
+
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<script>
+    // مركز محافظة القاهرة
+    const cairoCenter = [30.0444, 31.2357];
+
+    // إنشاء الخريطة
+    const map = L.map('map').setView(cairoCenter, 12); // zoom 12 يناسب المدينة
+
+    // إضافة طبقة خريطة OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 18,
+      minZoom: 10
+    }).addTo(map);
+
+    // بيانات الأصول (الأسماء + إحداثياتهم داخل المحافظة)
+    const assets = [
+      { name: "Vehicle Fleet", coords: [30.0500, 31.2330] },
+      { name: "IT Equipment", coords: [30.0400, 31.2400] },
+      { name: "Office Supplies", coords: [30.0460, 31.2300] },
+      { name: "HR Department", coords: [30.0420, 31.2370] },
+      { name: "Maintenance Tools", coords: [30.0485, 31.2450] },
+    ];
+
+    // إضافة كل أصل كنقطة على الخريطة مع نافذة منبثقة باسم الأصل
+    assets.forEach(asset => {
+      L.marker(asset.coords).addTo(map)
+        .bindPopup(<b>${asset.name}</b>)
+        .openPopup();
+    });
+</script>

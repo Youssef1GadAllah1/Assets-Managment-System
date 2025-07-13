@@ -1,0 +1,136 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Capstone_Next_Step</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    
+    <link rel="stylesheet" href="~/Capstone_Next_Step.styles.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="logo-container">
+            <div>Next Step</div>
+        </div>
+        <ul class="sidebar-menu" id="sidebar-menu">
+            <!-- Sidebar items will be generated here -->
+        </ul>
+    </div>
+
+
+    <div class="main-content">
+        <!-- Top Navigation Bar -->
+        <div class="top-navbar">
+            <div class="d-flex align-items-center">
+                <div class="hamburger" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search">
+                </div>
+            </div>
+            <div class="user-menu">
+                <div class="language-selector">
+                    <img src="https://via.placeholder.com/30x20" alt="English Flag">
+                    <span>English</span>
+                </div>
+                <div class="notification-badge">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">2</span>
+                </div>
+                <div class="user-profile">
+                    <div class="user-avatar">A</div>
+                    <div class="user-info">
+                        <div class="fw-bold">Ahmad</div>
+                        <div class="text-muted small">Admin</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+            <div class="pt-3">
+                <div class="container">
+                    <main role="main" class="pb-3">
+                        @RenderBody()
+                    </main>
+                </div>
+            </div>
+        </main>
+
+       
+
+    </div>
+    <script>
+        const currentPath = window.location.pathname.toLowerCase();
+
+        const sidebarItems = [
+
+            { text: "Home", icon: "fas fa-home", url: "https://localhost:7134" },
+            { text: "Inventory", icon: "fas fa-box", url: "/Asset/Inventory" },
+            { text: "Assets", icon: "fas fa-server", url: "/asset/index" },
+            { text: "Reports", icon: "fas fa-chart-bar", url: "/report/index" },
+            { text: "Employees", icon: "fas fa-users", url: "/home/employee" },
+            { text: "Chat", icon: "fas fa-comments", url: "/chat/index" },
+            { text: "Settings", icon: "fas fa-cog", url: "/profile/index" },
+            { text: "Map", icon: "fas fa-life-ring", url: "/asset/viewmap" },
+            { text: "Logout", icon: "fas fa-sign-out-alt", url: "#", isLogout: true }
+        ];
+
+        const sidebarMenu = document.getElementById("sidebar-menu");
+
+        sidebarItems.forEach(item => {
+            const li = document.createElement("li");
+            li.classList.add("sidebar-item");
+
+            // Mark active item
+            if (currentPath === new URL(item.url, window.location.origin).pathname.toLowerCase()) {
+                li.classList.add("active");
+            }
+
+            const a = document.createElement("a");
+            a.href = item.url;
+
+            const icon = document.createElement("i");
+            icon.className = item.icon;
+
+            const span = document.createElement("span");
+            span.textContent = item.text;
+
+            a.appendChild(icon);
+            a.appendChild(span);
+            li.appendChild(a);
+
+            // Special handling for logout
+            if (item.isLogout) {
+                li.classList.add("mt-5");
+                a.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    // Implement logout logic here
+                    alert("Logging out...");
+                    window.location.href = "/logout"; // Change as needed
+                });
+            }
+
+            sidebarMenu.appendChild(li);
+        });
+    </script>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

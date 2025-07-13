@@ -1,0 +1,34 @@
+﻿@model IEnumerable<Capstone_Next_Step.Models.Report>
+
+<div class="container-fluid mt-4">
+    <div class="page-title">
+        <h4>Reports Lists</h4>
+        <form action="AddReport" method="post">
+        <button class="add-report-btn">
+            Add Report
+            <i class="fas fa-pen"></i>
+            </button>
+        </form>
+    </div>
+
+    <!-- Reports Container -->
+    <div class="reports-container">
+
+
+        @foreach (var ReportList in Model) {
+            <div class="report-card">
+                <div class="report-header">
+                <div class="report-title">@ReportList.Title</div>
+                <div class="report-date">@ReportList.Created</div>
+                <div class="report-author">
+                    <div class="author-dot"></div>
+                    <span>@ReportList.Author</span>
+                </div>
+            </div>
+            <div class="report-content">
+              @ReportList.ReportContant
+            </div>
+        </div>
+        }
+</div>
+</div>

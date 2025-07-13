@@ -1,0 +1,77 @@
+﻿<div class="notifications">
+    <div class="notifications-header">Notifications</div>
+
+    <div class="notification-item">
+        <div class="notification-time">19:20</div>
+        <div class="notification-content">You have received a new message from the Operation Centre.</div>
+    </div>
+
+    <div class="notification-item">
+        <div class="notification-time">19:20</div>
+        <div class="notification-content">You have received a new message from the Operation Centre.</div>
+    </div>
+
+    <div class="notification-item">
+        <div class="notification-time">14:55</div>
+        <div class="notification-content">You have received a new message from Jeanette Barker.</div>
+    </div>
+
+    <div class="notification-item">
+        <div class="notification-time">14:55</div>
+        <div class="notification-content">Task ID WNR-014548 status has been updated to in-progress.</div>
+    </div>
+
+    <div class="notification-item">
+        <div class="notification-time">14:55</div>
+        <div class="notification-content">Task ID WNR-014556 has been assigned to you.</div>
+    </div>
+
+    <div class="notification-item">
+        <div class="notification-time">10/01/2025 15:34</div>
+        <div class="notification-content">Asset ID V:0250714 has been created successfully.</div>
+    </div>
+
+    <div class="notification-item">
+        <div class="notification-time">10/01/2025 09:14</div>
+        <div class="notification-content">You have a new task update from the Operation Centre.</div>
+    </div>
+
+    <div class="notification-item">
+        <div class="notification-time">10/01/2025 08:41</div>
+        <div class="notification-content">The due date for Task ID WNR-014567 has been extended to 30/01/2025.</div>
+    </div>
+
+    <div class="notification-item">
+        <div class="notification-time">10/01/2025 08:41</div>
+        <div class="notification-content">The due date for Task ID WNR-014567 has been extended to 30/01/2025.</div>
+    </div>
+</div>
+    </div>
+
+<script>
+    // Simple JavaScript to add some interactivity
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add click event listeners to notification items
+        const notificationItems = document.querySelectorAll('.notification-item');
+        notificationItems.forEach(item => {
+            item.addEventListener('click', function() {
+                // Toggle a "read" class to change the appearance
+                this.style.backgroundColor = '#ffffff';
+                this.style.borderLeft = '3px solid #1d9bf0';
+            });
+        });
+
+        // Notification counter functionality
+        const notificationBadge = document.querySelector('.badge');
+        let notificationCount = parseInt(notificationBadge.textContent);
+
+        document.querySelector('.notifications-icon').addEventListener('click', function() {
+            // Reset notification count on click
+            notificationCount = 0;
+            notificationBadge.textContent = notificationCount;
+            if (notificationCount === 0) {
+                notificationBadge.style.display = 'none';
+            }
+        });
+    });
+</script>
