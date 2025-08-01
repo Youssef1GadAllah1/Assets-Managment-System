@@ -40,7 +40,7 @@ namespace Capstone_Next_Step
 				name: "default",
 				pattern: "{controller=Login}/{action=AdminLogin}/{id?}");
 
-			app.Run();
+            app.Run();
 		}
 	}
 }

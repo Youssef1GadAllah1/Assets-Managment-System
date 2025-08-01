@@ -81,8 +81,61 @@ namespace Capstone_Next_Step.Controllers
         {
             try
             {
+                // Clear ProfileImage validation error if it's empty
+                if (ModelState.ContainsKey("ProfileImage") && ModelState["ProfileImage"].Errors.Count > 0)
+                {
+                    ModelState["ProfileImage"].Errors.Clear();
+                }
+
                 if (!ModelState.IsValid)
                 {
+                    return View(user);
+                }
+
+                // Check if username already exists
+                var existingUser = _appDbContext.Users.FirstOrDefault(u => u.UserName == user.UserName);
+                if (existingUser != null)
+                {
+                    ModelState.AddModelError("UserName", "Username already exists");
+                    return View(user);
+                }
+
+                // Check if email already exists
+                var existingEmail = _appDbContext.Users.FirstOrDefault(u => u.Email == user.Email);
+                if (existingEmail != null)
+                {
+                    ModelState.AddModelError("Email", "Email already exists");
+                    return View(user);
+                }
+
+                // Validate required fields
+                if (string.IsNullOrEmpty(user.Name))
+                {
+                    ModelState.AddModelError("Name", "Name is required");
+                    return View(user);
+                }
+
+                if (string.IsNullOrEmpty(user.UserName))
+                {
+                    ModelState.AddModelError("UserName", "Username is required");
+                    return View(user);
+                }
+
+                if (string.IsNullOrEmpty(user.Email))
+                {
+                    ModelState.AddModelError("Email", "Email is required");
+                    return View(user);
+                }
+
+                if (string.IsNullOrEmpty(user.Password))
+                {
+                    ModelState.AddModelError("Password", "Password is required");
+                    return View(user);
+                }
+
+                if (string.IsNullOrEmpty(user.JobTitle))
+                {
+                    ModelState.AddModelError("JobTitle", "Job Title is required");
                     return View(user);
                 }
 
@@ -90,6 +143,12 @@ namespace Capstone_Next_Step.Controllers
                 if (string.IsNullOrEmpty(user.Role))
                 {
                     user.Role = "User";
+                }
+
+                // Set default profile image if not specified
+                if (string.IsNullOrEmpty(user.ProfileImage))
+                {
+                    user.ProfileImage = "/Image/default-avatar.png";
                 }
 
                 _appDbContext.Users.Add(user);

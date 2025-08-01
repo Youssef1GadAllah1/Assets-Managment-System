@@ -99,12 +99,12 @@ namespace Capstone_Next_Step.Controllers
             try
             {
                 HttpContext.Session.Clear();
-                return RedirectToAction("Login");
+                return RedirectToAction("AdminLogin");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Logout error: {ex.Message}");
-                return RedirectToAction("Login");
+                return RedirectToAction("AdminLogin");
             }
         }
     }

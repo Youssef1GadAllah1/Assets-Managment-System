@@ -34,7 +34,19 @@ namespace Capstone_Next_Step.Controllers
 
         public IActionResult AddAsset()
         {
-            return View();
+            try
+            {
+                // Get all users for the dropdown
+                var users = _context.Users.ToList();
+                ViewBag.Users = users;
+                return View();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in AddAsset: {ex.Message}");
+                ViewBag.Users = new List<User>();
+                return View();
+            }
         }
 
         [HttpPost]
@@ -42,8 +54,17 @@ namespace Capstone_Next_Step.Controllers
         {
             try
             {
+                // Clear ImageUrl validation error if it's empty
+                if (ModelState.ContainsKey("ImageUrl") && ModelState["ImageUrl"].Errors.Count > 0)
+                {
+                    ModelState["ImageUrl"].Errors.Clear();
+                }
+
                 if (!ModelState.IsValid)
                 {
+                    // Get users for the dropdown when returning with errors
+                    var users = _context.Users.ToList();
+                    ViewBag.Users = users;
                     return View("AddAsset", asset);
                 }
 
@@ -51,6 +72,71 @@ namespace Capstone_Next_Step.Controllers
                 if (asset.date == default)
                 {
                     asset.date = DateTime.Now;
+                }
+
+                // Set default image URL if not provided
+                if (string.IsNullOrEmpty(asset.ImageUrl))
+                {
+                    asset.ImageUrl = "/Image/default-asset.png";
+                }
+
+                // Validate required fields
+                if (string.IsNullOrEmpty(asset.Name))
+                {
+                    ModelState.AddModelError("Name", "اسم الأصل مطلوب");
+                    var users = _context.Users.ToList();
+                    ViewBag.Users = users;
+                    return View("AddAsset", asset);
+                }
+
+                if (string.IsNullOrEmpty(asset.Category))
+                {
+                    ModelState.AddModelError("Category", "فئة الأصل مطلوبة");
+                    var users = _context.Users.ToList();
+                    ViewBag.Users = users;
+                    return View("AddAsset", asset);
+                }
+
+                if (string.IsNullOrEmpty(asset.Type))
+                {
+                    ModelState.AddModelError("Type", "نوع الأصل مطلوب");
+                    var users = _context.Users.ToList();
+                    ViewBag.Users = users;
+                    return View("AddAsset", asset);
+                }
+
+                if (string.IsNullOrEmpty(asset.Color))
+                {
+                    ModelState.AddModelError("Color", "لون الأصل مطلوب");
+                    var users = _context.Users.ToList();
+                    ViewBag.Users = users;
+                    return View("AddAsset", asset);
+                }
+
+                if (string.IsNullOrEmpty(asset.Location))
+                {
+                    ModelState.AddModelError("Location", "موقع الأصل مطلوب");
+                    var users = _context.Users.ToList();
+                    ViewBag.Users = users;
+                    return View("AddAsset", asset);
+                }
+
+                if (string.IsNullOrEmpty(asset.Status))
+                {
+                    ModelState.AddModelError("Status", "حالة الأصل مطلوبة");
+                    var users = _context.Users.ToList();
+                    ViewBag.Users = users;
+                    return View("AddAsset", asset);
+                }
+
+                // Validate that the user exists
+                var user = _context.Users.FirstOrDefault(u => u.Id == asset.UserId);
+                if (user == null)
+                {
+                    ModelState.AddModelError("UserId", "يرجى اختيار مستخدم صحيح");
+                    var users = _context.Users.ToList();
+                    ViewBag.Users = users;
+                    return View("AddAsset", asset);
                 }
 
                 // Handle custom coordinates
@@ -62,7 +148,7 @@ namespace Capstone_Next_Step.Controllers
                 _context.Assets.Add(asset);
                 _context.SaveChanges();
 
-                TempData["SuccessMessage"] = "تم إضافة الأصل بنجاح";
+                TempData["SuccessMessage"] = "تم إضافة الأصل بنجاح!";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
@@ -97,6 +183,20 @@ namespace Capstone_Next_Step.Controllers
             {
                 if (!ModelState.IsValid)
                 {
+                    return View("AddProduct", product);
+                }
+
+                // Validate price is positive
+                if (product.Price < 0)
+                {
+                    ModelState.AddModelError("Price", "Price must be positive");
+                    return View("AddProduct", product);
+                }
+
+                // Validate count is positive
+                if (product.Count < 0)
+                {
+                    ModelState.AddModelError("Count", "Count must be positive");
                     return View("AddProduct", product);
                 }
 

@@ -1,6 +1,20 @@
 ﻿<div class="form-container">
     <h4 class="mb-4">Add report</h4>
-    <form action="AddReportForm">
+    
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <h6>يرجى تصحيح الأخطاء التالية:</h6>
+            <ul class="mb-0">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+    
+    <form action="AddReportForm" method="post">
         <div class="mb-3">
             <input type="text" name="Title" class="form-control" placeholder="Title" required>
         </div>
@@ -9,13 +23,33 @@
         </div>
        
         <div class="mb-3">
-            <input type="text" name="Author" class="form-control" placeholder="Author" required>
+            <input type="text" name="Author" class="form-control" placeholder="Author" value="@Context.Session.GetString("Name")" required>
         </div>
         <div class="mb-3">
-            <input type="number" name="CreatedById" class="form-control" placeholder="CreatedById" required>
+            <label for="userIdSelect" class="form-label">Created By</label>
+            <select name="CreatedById" class="form-select" id="userIdSelect" required>
+                <option value="" selected disabled>اختر المستخدم</option>
+                @if (ViewBag.Users != null)
+                {
+                    @foreach (var user in ViewBag.Users)
+                    {
+                        <option value="@user.Id">@user.Name (@user.UserName)</option>
+                    }
+                }
+            </select>
         </div>
         <div class="mb-3">
-            <input type="number" name="AssetId" class="form-control" placeholder="AssetId" required>
+            <label for="assetIdSelect" class="form-label">Asset</label>
+            <select name="AssetId" class="form-select" id="assetIdSelect" required>
+                <option value="" selected disabled>اختر الأصل</option>
+                @if (ViewBag.Assets != null)
+                {
+                    @foreach (var asset in ViewBag.Assets)
+                    {
+                        <option value="@asset.Id">@asset.Name - @asset.Category</option>
+                    }
+                }
+            </select>
         </div>
         <div class="mb-4">
             <textarea name="ReportContant" class="form-control" placeholder="Enter your report" required></textarea>

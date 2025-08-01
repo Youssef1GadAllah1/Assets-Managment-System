@@ -134,7 +134,7 @@
         // سايد بار ديناميكي عربي/إنجليزي
         const lang = '@(Context.Session.GetString("lang") ?? "en")';
         const sidebarItems = [
-            lang === 'ar' ? { text: "الرئيسية", icon: "fas fa-home", url: "https://localhost:7134" } : { text: "Home", icon: "fas fa-home", url: "https://localhost:7134" },
+            lang === 'ar' ? { text: "الرئيسية", icon: "fas fa-home", url: "/Home/Index" } : { text: "Home", icon: "fas fa-home", url: "/Home/Index" },
             lang === 'ar' ? { text: "المخزون", icon: "fas fa-box", url: "/Asset/Inventory" } : { text: "Inventory", icon: "fas fa-box", url: "/Asset/Inventory" },
             lang === 'ar' ? { text: "الأصول", icon: "fas fa-server", url: "/asset/index" } : { text: "Assets", icon: "fas fa-server", url: "/asset/index" },
             lang === 'ar' ? { text: "التقارير", icon: "fas fa-chart-bar", url: "/report/index" } : { text: "Reports", icon: "fas fa-chart-bar", url: "/report/index" },
