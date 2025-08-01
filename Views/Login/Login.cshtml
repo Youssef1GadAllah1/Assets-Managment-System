@@ -3,6 +3,14 @@
 }
 <div class="container">
     <form action="CheckLogin" method="post" class="form-signin">
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger text-center mb-3">@ViewBag.Error</div>
+        }
+        @if (ViewBag.Success != null)
+        {
+            <div class="alert alert-success text-center mb-3">@ViewBag.Success</div>
+        }
         <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
         <div class="form-group m-4">
             <label  class="control-label">UserName</label>

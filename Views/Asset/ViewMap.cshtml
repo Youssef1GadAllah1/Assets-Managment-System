@@ -81,6 +81,19 @@
             height: 40px;
             margin-right: 10px;
         }
+        /* تحسين شكل tooltip */
+        .asset-tooltip {
+            background: rgba(0, 0, 0, 0.9) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 8px !important;
+            padding: 8px 12px !important;
+            font-size: 12px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+        }
+        .asset-tooltip::before {
+            border-top-color: rgba(0, 0, 0, 0.9) !important;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -108,114 +121,82 @@
     <script>
         let map;
         let assetMarkers;
-        let assets = [
-            {
-                id: 1,
-                name: "Company Van",
-                description: "Ford Transit 2020",
-                location: { lat: 30.0444, lng: 31.2357 }, // Cairo
-                status: "in-use",
-                assignedTo: "Ahmed Hassan",
-                lastUpdated: "2024-12-15T10:30:00Z"
-            },
-            {
-                id: 2,
-                name: "Laptop",
-                description: "Dell XPS 15",
-                location: { lat: 31.2001, lng: 29.9187 }, // Alexandria
-                status: "available",
-                assignedTo: null,
-                lastUpdated: "2024-12-14T15:45:00Z"
-            },
-            {
-                id: 3,
-                name: "Drill Press",
-                description: "Industrial grade",
-                location: { lat: 25.6872, lng: 32.6396 }, // Luxor
-                status: "maintenance",
-                assignedTo: "Maintenance Dept",
-                lastUpdated: "2024-12-10T08:15:00Z"
-            },
-            {
-                id: 4,
-                name: "Forklift",
-                description: "Toyota 3-ton",
-                location: { lat: 27.2579, lng: 33.8116 }, // Hurghada
-                status: "available",
-                assignedTo: null,
-                lastUpdated: "2024-12-12T11:20:00Z"
-            },
-            {
-                id: 5,
-                name: "Security Camera",
-                description: "Outdoor 4K",
-                location: { lat: 24.0889, lng: 32.8998 }, // Aswan
-                status: "in-use",
-                assignedTo: "Security Team",
-                lastUpdated: "2024-12-15T09:10:00Z"
-            },
-            {
-                id: 6,
-                name: "Generator",
-                description: "Diesel 50KW",
-                location: { lat: 26.8206, lng: 30.8025 }, // Central Egypt
-                status: "available",
-                assignedTo: null,
-                lastUpdated: "2024-12-13T14:30:00Z"
-            }
-        ];
+        let assets = [];
 
         // Initialize the map centered on Egypt
         function initializeMap() {
             map = L.map('map').setView([26.8206, 30.8025], 6); // Center on Egypt
-
-            // Add OpenStreetMap tiles
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
-
-            // Create a feature group to store our asset markers
             assetMarkers = L.featureGroup().addTo(map);
         }
 
         // Add markers for each asset
         function addAssetMarkers() {
-            // Clear existing markers
             assetMarkers.clearLayers();
-
             assets.forEach(asset => {
                 const marker = L.marker([asset.location.lat, asset.location.lng], {
                     icon: L.divIcon({
-                        className: `asset-marker ${asset.status === 'available' ? '' :
-                                  asset.status === 'in-use' ? 'in-use' : 'maintenance'}`,
+                        className: `asset-marker ${asset.status === 'available' ? '' : asset.status === 'in-use' ? 'in-use' : 'maintenance'}`,
                         html: asset.id.toString()
                     })
                 });
-
                 marker.bindPopup(createAssetPopup(asset));
+                // إضافة tooltip يظهر عند تمرير الماوس
+                marker.bindTooltip(createAssetTooltip(asset), {
+                    permanent: false,
+                    direction: 'top',
+                    className: 'asset-tooltip'
+                });
                 assetMarkers.addLayer(marker);
             });
-
-            // Fit map to show all markers if there are any
             if (assets.length > 0) {
                 map.fitBounds(assetMarkers.getBounds(), { padding: [20, 20] });
             }
         }
 
+        // إنشاء tooltip بسيط يظهر عند تمرير الماوس
+        function createAssetTooltip(asset) {
+            const statusText = asset.status === "available" ? "Available" : 
+                               asset.status === "in-use" ? "In Use" : "Maintenance";
+            return `
+                <div style="min-width: 150px; text-align: center;">
+                <strong>${asset.name}</strong><br>
+                <small>${asset.description}</small><br>
+                <span style="color: ${asset.status === 'available' ? '#16a34a' : 
+                                    asset.status === 'in-use' ? '#dc2626' : '#d97706'}">
+                    ${statusText}
+                </span>
+                </div>
+            `;
+        }
+
         // Create HTML content for asset popup
         function createAssetPopup(asset) {
-            const statusText = asset.status === "available" ? "Available" :
-                               asset.status === "in-use" ? "In Use" : "Maintenance";
-
-            const statusClass = asset.status === "available" ? "status-available" :
-                                asset.status === "in-use" ? "status-in-use" : "status-maintenance";
-
+            const statusText = asset.status === "available" ? "Available" : asset.status === "in-use" ? "In Use" : "Maintenance";
+            const statusClass = asset.status === "available" ? "status-available" : asset.status === "in-use" ? "status-in-use" : "status-maintenance";
             const lastUpdated = asset.lastUpdated ? new Date(asset.lastUpdated).toLocaleString('en-EG') : 'Unknown';
-
             return `
                 <div class="asset-popup">
                     <h3 class="font-bold text-lg mb-1">${asset.name}</h3>
                     <p class="text-gray-600 mb-2">${asset.description || 'No description available'}</p>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm text-gray-500">Category:</span>
+                        <span class="text-sm">${asset.category || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm text-gray-500">Type:</span>
+                        <span class="text-sm">${asset.type || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm text-gray-500">Color:</span>
+                        <span class="text-sm">${asset.color || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-sm text-gray-500">Price:</span>
+                        <span class="text-sm">$${asset.price || '0'}</span>
+                    </div>
                     <div class="flex justify-between mb-2">
                         <span class="text-sm text-gray-500">Status:</span>
                         <span class="${statusClass} asset-status">${statusText}</span>
@@ -237,15 +218,11 @@
         // Update asset summary cards
         function updateAssetSummary() {
             const summaryContainer = document.getElementById("assetSummary");
-
-            // Count assets by status
             const statusCounts = {
                 available: assets.filter(a => a.status === "available").length,
                 "in-use": assets.filter(a => a.status === "in-use").length,
                 maintenance: assets.filter(a => a.status === "maintenance").length
             };
-
-            // Create summary cards
             summaryContainer.innerHTML = `
                 <div class="bg-blue-50 p-4 rounded-lg">
                     <h3 class="font-semibold text-blue-800 mb-2">Available Assets</h3>
@@ -258,7 +235,7 @@
                     <p class="text-sm text-red-500 mt-1">Currently assigned</p>
                 </div>
                 <div class="bg-yellow-50 p-4 rounded-lg">
-                    <h3 class="font-semibold text-yellow-800 mb-2">Under Maintenance</h3>
+                    <h3 class="text-yellow-800 font-semibold mb-2">Under Maintenance</h3>
                     <p class="text-3xl font-bold text-yellow-600">${statusCounts.maintenance}</p>
                     <p class="text-sm text-yellow-500 mt-1">Being serviced</p>
                 </div>
@@ -266,22 +243,31 @@
         }
 
         // Initialize the application
-        function initApp() {
-            initializeMap();
-            addAssetMarkers();
-            updateAssetSummary();
-
-            // Show the map and hide loading
-            document.getElementById('loadingMap').style.display = 'none';
-            document.getElementById('map').style.display = 'block';
-
-            // Refresh the map size after showing
-            setTimeout(() => {
-                map.invalidateSize();
-            }, 100);
+        async function initApp() {
+            try {
+                initializeMap();
+                console.log('Loading assets from server...');
+                const res = await fetch('/Asset/GetAssets');
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                assets = await res.json();
+                console.log(`Loaded ${assets.length} assets from database`);
+                addAssetMarkers();
+                updateAssetSummary();
+                document.getElementById('loadingMap').style.display = 'none';
+                document.getElementById('map').style.display = 'block';
+                setTimeout(() => { map.invalidateSize(); }, 100);
+            } catch (error) {
+                console.error('Error loading assets:', error);
+                document.getElementById('loadingMap').innerHTML = `
+                    <div class="text-red-600">
+                        <div class="spinner"></div>
+                        Error loading assets: ${error.message}
+                    </div>
+                `;
+            }
         }
-
-        // Initialize when page loads
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>

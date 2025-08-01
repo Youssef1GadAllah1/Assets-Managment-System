@@ -1,0 +1,214 @@
+@model Capstone_Next_Step.Models.SearchResultViewModel
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">
+                    <i class="fas fa-search text-primary me-2"></i>
+                    نتائج البحث: "@Model.SearchTerm"
+                </h2>
+                <span class="badge bg-primary fs-6">@Model.TotalResults نتيجة</span>
+            </div>
+
+            @if (Model.TotalResults == 0)
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">لا توجد نتائج</h4>
+                    <p class="text-muted">جرب البحث بكلمات مختلفة</p>
+                </div>
+            }
+            else
+            {
+                <!-- Assets Section -->
+                @if (Model.Assets.Any())
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-server me-2"></i>
+                                الأصول (@Model.Assets.Count)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                @foreach (var asset in Model.Assets)
+                                {
+                                    <div class="col-md-6 col-lg-4 mb-3">
+                                        <div class="card h-100 border-0 shadow-sm">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-primary">@asset.Name</h6>
+                                                <p class="card-text text-muted mb-1">
+                                                    <i class="fas fa-tag me-1"></i>@asset.Category
+                                                </p>
+                                                <p class="card-text text-muted mb-1">
+                                                    <i class="fas fa-cog me-1"></i>@asset.Type
+                                                </p>
+                                                <p class="card-text text-muted mb-2">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>@asset.Location
+                                                </p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="badge bg-@(asset.Status?.ToLower() == "complete" ? "success" : asset.Status?.ToLower() == "in-progress" ? "warning" : "secondary")">
+                                                        @asset.Status
+                                                    </span>
+                                                    <a href="/Asset/Index" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-eye me-1"></i>عرض
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Products Section -->
+                @if (Model.Products.Any())
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-box me-2"></i>
+                                المنتجات (@Model.Products.Count)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                @foreach (var product in Model.Products)
+                                {
+                                    <div class="col-md-6 col-lg-4 mb-3">
+                                        <div class="card h-100 border-0 shadow-sm">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-success">@product.Name</h6>
+                                                <p class="card-text text-muted mb-1">
+                                                    <i class="fas fa-tag me-1"></i>@product.Category
+                                                </p>
+                                                <p class="card-text text-muted mb-1">
+                                                    <i class="fas fa-cog me-1"></i>@product.Type
+                                                </p>
+                                                <p class="card-text text-muted mb-2">
+                                                    <i class="fas fa-palette me-1"></i>@product.Color
+                                                </p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="badge bg-info">@product.Count قطعة</span>
+                                                    <span class="text-primary fw-bold">@product.Price ج.م</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Users Section -->
+                @if (Model.Users.Any())
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-users me-2"></i>
+                                الموظفين (@Model.Users.Count)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                @foreach (var user in Model.Users)
+                                {
+                                    <div class="col-md-6 col-lg-4 mb-3">
+                                        <div class="card h-100 border-0 shadow-sm">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center mb-3">
+                                                    <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                                        @user.Name.Substring(0, 1).ToUpper()
+                                                    </div>
+                                                    <div>
+                                                        <h6 class="card-title mb-1">@user.Name</h6>
+                                                        <p class="card-text text-muted mb-0">@user.JobTitle</p>
+                                                    </div>
+                                                </div>
+                                                <p class="card-text text-muted mb-1">
+                                                    <i class="fas fa-envelope me-1"></i>@user.Email
+                                                </p>
+                                                <p class="card-text text-muted mb-2">
+                                                    <i class="fas fa-user me-1"></i>@user.UserName
+                                                </p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="badge bg-secondary">@user.Role</span>
+                                                    <a href="/Home/Employee" class="btn btn-sm btn-outline-info">
+                                                        <i class="fas fa-eye me-1"></i>عرض
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Reports Section -->
+                @if (Model.Reports.Any())
+                {
+                    <div class="card mb-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                التقارير (@Model.Reports.Count)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                @foreach (var report in Model.Reports)
+                                {
+                                    <div class="col-md-6 col-lg-4 mb-3">
+                                        <div class="card h-100 border-0 shadow-sm">
+                                            <div class="card-body">
+                                                <h6 class="card-title text-warning">@report.Title</h6>
+                                                <p class="card-text text-muted mb-1">
+                                                    <i class="fas fa-user me-1"></i>@report.Author
+                                                </p>
+                                                <p class="card-text text-muted mb-2">
+                                                    <i class="fas fa-calendar me-1"></i>@report.Created.ToString("dd/MM/yyyy")
+                                                </p>
+                                                <p class="card-text small text-muted">
+                                                    @(report.Description.Length > 100 ? report.Description.Substring(0, 100) + "..." : report.Description)
+                                                </p>
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="badge bg-warning text-dark">تقرير</span>
+                                                    <a href="/Report/Index" class="btn btn-sm btn-outline-warning">
+                                                        <i class="fas fa-eye me-1"></i>عرض
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar {
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+    
+    .card {
+        transition: transform 0.2s;
+    }
+    
+    .card:hover {
+        transform: translateY(-2px);
+    }
+</style> 

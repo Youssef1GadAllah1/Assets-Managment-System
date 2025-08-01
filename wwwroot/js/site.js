@@ -704,3 +704,348 @@ document.addEventListener('DOMContentLoaded', function () {
       .openPopup();
   });
 
+
+// Global utility functions
+const Utils = {
+    // Show success message
+    showSuccess: function(message) {
+        this.showAlert('success', message);
+    },
+    
+    // Show error message
+    showError: function(message) {
+        this.showAlert('danger', message);
+    },
+    
+    // Show warning message
+    showWarning: function(message) {
+        this.showAlert('warning', message);
+    },
+    
+    // Show info message
+    showInfo: function(message) {
+        this.showAlert('info', message);
+    },
+    
+    // Generic alert function
+    showAlert: function(type, message) {
+        const alertHtml = `
+            <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+                <i class="fas fa-${this.getIcon(type)} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+        
+        const container = document.querySelector('.container');
+        if (container) {
+            container.insertAdjacentHTML('afterbegin', alertHtml);
+            
+            // Auto dismiss after 5 seconds
+            setTimeout(() => {
+                const alert = document.querySelector('.alert');
+                if (alert) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+    },
+    
+    // Get icon based on alert type
+    getIcon: function(type) {
+        const icons = {
+            'success': 'check-circle',
+            'danger': 'exclamation-circle',
+            'warning': 'exclamation-triangle',
+            'info': 'info-circle'
+        };
+        return icons[type] || 'info-circle';
+    },
+    
+    // Format date
+    formatDate: function(date) {
+        return new Date(date).toLocaleDateString('ar-EG');
+    },
+    
+    // Format currency
+    formatCurrency: function(amount) {
+        return new Intl.NumberFormat('ar-EG', {
+            style: 'currency',
+            currency: 'EGP'
+        }).format(amount);
+    },
+    
+    // Validate email
+    isValidEmail: function(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    },
+    
+    // Validate phone number
+    isValidPhone: function(phone) {
+        const phoneRegex = /^(\+2)?01[0125][0-9]{8}$/;
+        return phoneRegex.test(phone);
+    },
+    
+    // Debounce function
+    debounce: function(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+};
+
+// Form validation
+const FormValidator = {
+    // Validate required fields
+    validateRequired: function(form) {
+        const requiredFields = form.querySelectorAll('[required]');
+        let isValid = true;
+        
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                this.showFieldError(field, 'هذا الحقل مطلوب');
+                isValid = false;
+            } else {
+                this.clearFieldError(field);
+            }
+        });
+        
+        return isValid;
+    },
+    
+    // Validate email field
+    validateEmail: function(field) {
+        if (field.value && !Utils.isValidEmail(field.value)) {
+            this.showFieldError(field, 'يرجى إدخال بريد إلكتروني صحيح');
+            return false;
+        }
+        this.clearFieldError(field);
+        return true;
+    },
+    
+    // Validate phone field
+    validatePhone: function(field) {
+        if (field.value && !Utils.isValidPhone(field.value)) {
+            this.showFieldError(field, 'يرجى إدخال رقم هاتف صحيح');
+            return false;
+        }
+        this.clearFieldError(field);
+        return true;
+    },
+    
+    // Show field error
+    showFieldError: function(field, message) {
+        field.classList.add('is-invalid');
+        
+        let errorDiv = field.parentNode.querySelector('.invalid-feedback');
+        if (!errorDiv) {
+            errorDiv = document.createElement('div');
+            errorDiv.className = 'invalid-feedback';
+            field.parentNode.appendChild(errorDiv);
+        }
+        errorDiv.textContent = message;
+    },
+    
+    // Clear field error
+    clearFieldError: function(field) {
+        field.classList.remove('is-invalid');
+        const errorDiv = field.parentNode.querySelector('.invalid-feedback');
+        if (errorDiv) {
+            errorDiv.remove();
+        }
+    }
+};
+
+// Animation utilities
+const Animations = {
+    // Fade in element
+    fadeIn: function(element, duration = 300) {
+        element.style.opacity = '0';
+        element.style.display = 'block';
+        
+        let start = null;
+        const animate = (timestamp) => {
+            if (!start) start = timestamp;
+            const progress = timestamp - start;
+            const opacity = Math.min(progress / duration, 1);
+            
+            element.style.opacity = opacity;
+            
+            if (progress < duration) {
+                requestAnimationFrame(animate);
+            }
+        };
+        
+        requestAnimationFrame(animate);
+    },
+    
+    // Fade out element
+    fadeOut: function(element, duration = 300) {
+        let start = null;
+        const animate = (timestamp) => {
+            if (!start) start = timestamp;
+            const progress = timestamp - start;
+            const opacity = Math.max(1 - progress / duration, 0);
+            
+            element.style.opacity = opacity;
+            
+            if (progress < duration) {
+                requestAnimationFrame(animate);
+            } else {
+                element.style.display = 'none';
+            }
+        };
+        
+        requestAnimationFrame(animate);
+    },
+    
+    // Slide down element
+    slideDown: function(element, duration = 300) {
+        element.style.height = '0px';
+        element.style.overflow = 'hidden';
+        element.style.display = 'block';
+        
+        const targetHeight = element.scrollHeight;
+        let start = null;
+        
+        const animate = (timestamp) => {
+            if (!start) start = timestamp;
+            const progress = timestamp - start;
+            const height = Math.min((progress / duration) * targetHeight, targetHeight);
+            
+            element.style.height = height + 'px';
+            
+            if (progress < duration) {
+                requestAnimationFrame(animate);
+            } else {
+                element.style.height = 'auto';
+                element.style.overflow = 'visible';
+            }
+        };
+        
+        requestAnimationFrame(animate);
+    },
+    
+    // Slide up element
+    slideUp: function(element, duration = 300) {
+        const targetHeight = element.scrollHeight;
+        element.style.height = targetHeight + 'px';
+        element.style.overflow = 'hidden';
+        
+        let start = null;
+        
+        const animate = (timestamp) => {
+            if (!start) start = timestamp;
+            const progress = timestamp - start;
+            const height = Math.max(targetHeight - (progress / duration) * targetHeight, 0);
+            
+            element.style.height = height + 'px';
+            
+            if (progress < duration) {
+                requestAnimationFrame(animate);
+            } else {
+                element.style.display = 'none';
+                element.style.height = 'auto';
+                element.style.overflow = 'visible';
+            }
+        };
+        
+        requestAnimationFrame(animate);
+    }
+};
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize form validation
+    const forms = document.querySelectorAll('form[data-validate]');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            if (!FormValidator.validateRequired(this)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        // Real-time validation
+        const emailFields = form.querySelectorAll('input[type="email"]');
+        emailFields.forEach(field => {
+            field.addEventListener('blur', () => FormValidator.validateEmail(field));
+        });
+        
+        const phoneFields = form.querySelectorAll('input[type="tel"]');
+        phoneFields.forEach(field => {
+            field.addEventListener('blur', () => FormValidator.validatePhone(field));
+        });
+    });
+    
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Initialize popovers
+    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    popoverTriggerList.map(function(popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+    });
+    
+    // Auto-hide alerts
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            if (alert) {
+                Animations.fadeOut(alert, 500);
+            }
+        }, 5000);
+    });
+    
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+    
+    // Add loading state to buttons
+    document.querySelectorAll('button[type="submit"]').forEach(button => {
+        button.addEventListener('click', function() {
+            if (this.form && this.form.checkValidity()) {
+                this.disabled = true;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>جاري الإرسال...';
+            }
+        });
+    });
+    
+    // Initialize search functionality
+    const searchInput = document.getElementById('globalSearch');
+    if (searchInput) {
+        const debouncedSearch = Utils.debounce(function(query) {
+            // Search functionality is handled in Layout.cshtml
+        }, 300);
+        
+        searchInput.addEventListener('input', function() {
+            debouncedSearch(this.value);
+        });
+    }
+});
+
+// Export utilities for global use
+window.Utils = Utils;
+window.FormValidator = FormValidator;
+window.Animations = Animations;
+

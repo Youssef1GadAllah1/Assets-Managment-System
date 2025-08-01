@@ -1,0 +1,36 @@
+@model Capstone_Next_Step.Models.ErrorViewModel
+@{
+    ViewData["Title"] = "خطأ";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-0 shadow">
+                <div class="card-body text-center p-5">
+                    <i class="fas fa-exclamation-triangle text-warning fa-3x mb-4"></i>
+                    <h2 class="text-danger mb-3">عذراً، حدث خطأ</h2>
+                    <p class="text-muted mb-4">
+                        حدث خطأ أثناء معالجة طلبك. يرجى المحاولة مرة أخرى أو التواصل مع المسؤول.
+                    </p>
+                    
+                    @if (Model.ShowRequestId)
+                    {
+                        <div class="alert alert-info">
+                            <strong>Request ID:</strong> <code>@Model.RequestId</code>
+                        </div>
+                    }
+                    
+                    <div class="mt-4">
+                        <a href="/" class="btn btn-primary me-2">
+                            <i class="fas fa-home me-2"></i>العودة للرئيسية
+                        </a>
+                        <button onclick="history.back()" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>العودة للصفحة السابقة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

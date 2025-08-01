@@ -25,7 +25,76 @@
             <input name="Color" type="text" class="form-control" id="category" placeholder="Color" required>
         </div>
         <div class="mb-3">
-            <input name="Location" type="text" class="form-control" id="category" placeholder="Location" required>
+            <label for="locationSelect" class="form-label">Location</label>
+            <select name="Location" class="form-select" id="locationSelect" required>
+                <option value="" selected disabled>اختر الموقع</option>
+                <option value="cairo">القاهرة</option>
+                <option value="alexandria">الإسكندرية</option>
+                <option value="giza">الجيزة</option>
+                <option value="6 october">6 أكتوبر</option>
+                <option value="new cairo">القاهرة الجديدة</option>
+                <option value="nasr city">مدينة نصر</option>
+                <option value="abbassia">العباسية</option>
+                <option value="ain shams">عين شمس</option>
+                <option value="shoubra">شبرا</option>
+                <option value="shoubra el kheima">شبرا الخيمة</option>
+                <option value="el marg">المرج</option>
+                <option value="helwan">حلوان</option>
+                <option value="maadi">المعادي</option>
+                <option value="zamalek">الزمالك</option>
+                <option value="dokki">الدقي</option>
+                <option value="mohandessin">المهندسين</option>
+                <option value="agouza">العجوزة</option>
+                <option value="badr city">مدينة بدر</option>
+                <option value="obour city">مدينة العبور</option>
+                <option value="shorouk city">مدينة الشروق</option>
+                <option value="rehab city">مدينة الرحاب</option>
+                <option value="madinaty">مدينتي</option>
+                <option value="tagammu el khamis">التجمع الخامس</option>
+                <option value="tagammu el awal">التجمع الأول</option>
+                <option value="tagammu el thani">التجمع الثاني</option>
+                <option value="tagammu el thaleth">التجمع الثالث</option>
+                <option value="tagammu el rabe3">التجمع الرابع</option>
+                <option value="tagammu el sadis">التجمع السادس</option>
+                <option value="tagammu el sabi3">التجمع السابع</option>
+                <option value="tagammu el thamin">التجمع الثامن</option>
+                <option value="tagammu el tasi3">التجمع التاسع</option>
+                <option value="tagammu el 3ashir">التجمع العاشر</option>
+                <option value="luxor">الأقصر</option>
+                <option value="aswan">أسوان</option>
+                <option value="hurghada">الغردقة</option>
+                <option value="sharm el sheikh">شرم الشيخ</option>
+                <option value="port said">بورسعيد</option>
+                <option value="suez">السويس</option>
+                <option value="ismailia">الإسماعيلية</option>
+                <option value="mansoura">المنصورة</option>
+                <option value="tanta">طنطا</option>
+                <option value="zagazig">الزقازيق</option>
+                <option value="fayoum">الفيوم</option>
+                <option value="beni suef">بني سويف</option>
+                <option value="minya">المنيا</option>
+                <option value="asyut">أسيوط</option>
+                <option value="sohag">سوهاج</option>
+                <option value="qena">قنا</option>
+                <option value="kom ombo">كوم أمبو</option>
+                <option value="edfu">إدفو</option>
+            </select>
+        </div>
+        
+        <!-- إحداثيات دقيقة (اختياري) -->
+        <div class="mb-3">
+            <label class="form-label">إحداثيات دقيقة (اختياري)</label>
+            <div class="row">
+                <div class="col-md-6">
+                    <input type="number" step="0.000001" class="form-control" id="latitude" placeholder="خط العرض (Latitude)" 
+                           name="Latitude" min="-90" max="90">
+                </div>
+                <div class="col-md-6">
+                    <input type="number" step="0.000001" class="form-control" id="longitude" placeholder="خط الطول (Longitude)" 
+                           name="Longitude" min="-180" max="180">
+                </div>
+            </div>
+            <small class="form-text text-muted">اتركها فارغة لاستخدام إحداثيات المدينة المختارة</small>
         </div>
         <div class="mb-3">
             <label  for="exampleSelect" class="form-label">Status</label>
@@ -55,6 +124,9 @@
         const previewImage = document.getElementById('preview-image');
         const imageError = document.getElementById('image-error');
         const form = document.getElementById('itemForm');
+        const locationSelect = document.getElementById('locationSelect');
+        const latitudeInput = document.getElementById('latitude');
+        const longitudeInput = document.getElementById('longitude');
 
         // Open file dialog when clicking on the drop area
         dropArea.addEventListener('click', () => {
@@ -141,6 +213,40 @@
             // Show the icon and text when there's an error
             document.querySelector('.upload-icon').style.display = 'block';
             document.querySelector('.upload-text').style.display = 'block';
+        }
+
+        // Location handling
+        if (locationSelect) {
+            locationSelect.addEventListener('change', function() {
+                const selectedLocation = this.value;
+                if (selectedLocation) {
+                    // يمكن إضافة منطق إضافي هنا إذا لزم الأمر
+                    console.log('Selected location:', selectedLocation);
+                }
+            });
+        }
+
+        // Coordinate validation
+        if (latitudeInput && longitudeInput) {
+            latitudeInput.addEventListener('input', validateCoordinates);
+            longitudeInput.addEventListener('input', validateCoordinates);
+        }
+
+        function validateCoordinates() {
+            const lat = parseFloat(latitudeInput.value);
+            const lng = parseFloat(longitudeInput.value);
+            
+            if (lat < -90 || lat > 90) {
+                latitudeInput.setCustomValidity('خط العرض يجب أن يكون بين -90 و 90');
+            } else {
+                latitudeInput.setCustomValidity('');
+            }
+            
+            if (lng < -180 || lng > 180) {
+                longitudeInput.setCustomValidity('خط الطول يجب أن يكون بين -180 و 180');
+            } else {
+                longitudeInput.setCustomValidity('');
+            }
         }
 
         // Form submission (you can customize this based on your backend needs)

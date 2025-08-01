@@ -25,104 +25,305 @@
     </div>
 
 
-    <div class="main-content">
-        <!-- Top Navigation Bar -->
-        <div class="top-navbar">
-            <div class="d-flex align-items-center">
-                <div class="hamburger" id="sidebarToggle">
-                    <i class="fas fa-bars"></i>
+    @if (!string.IsNullOrEmpty(Context.Session.GetString("UserName")))
+    {
+        <div class="main-content">
+            <!-- Top Navigation Bar -->
+            <div class="top-navbar d-flex justify-content-between align-items-center px-4 py-2 shadow-sm" style="background: #fff; border-radius: 0 0 16px 16px;">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="hamburger me-3" id="sidebarToggle">
+                        <i class="fas fa-bars fa-lg"></i>
+                    </div>
+                    <div class="search-bar position-relative">
+                        <i class="fas fa-search position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); color: #6366f1;"></i>
+                        <input type="text" class="form-control ps-5" id="globalSearch" placeholder="البحث في الأصول، المنتجات، الموظفين..." style="border-radius: 20px; min-width: 300px;">
+                        <div id="searchResults" class="position-absolute w-100 bg-white border rounded shadow-sm" style="top: 100%; left: 0; z-index: 1000; display: none; max-height: 400px; overflow-y: auto;"></div>
+                    </div>
                 </div>
-                <div class="search-bar">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Search">
-                </div>
-            </div>
-            <div class="user-menu">
-                <div class="language-selector">
-                    <img src="https://via.placeholder.com/30x20" alt="English Flag">
-                    <span>English</span>
-                </div>
-                <div class="notification-badge">
-                    <i class="fas fa-bell"></i>
-                    <span class="badge">2</span>
-                </div>
-                <div class="user-profile">
-                    <div class="user-avatar">A</div>
-                    <div class="user-info">
-                        <div class="fw-bold">Ahmad</div>
-                        <div class="text-muted small">Admin</div>
+                <div class="d-flex align-items-center gap-4">
+                    <div class="language-selector d-flex align-items-center gap-1">
+                        <button id="lang-en" type="button" class="btn btn-link p-0 me-2" style="font-weight: 500;">English</button>
+                        <span>|</span>
+                        <button id="lang-ar" type="button" class="btn btn-link p-0 ms-2" style="font-weight: 500;">عربي</button>
+                    </div>
+                    <div class="theme-toggle ms-3">
+                        <button id="themeToggle" type="button" class="btn btn-outline-secondary btn-sm">
+                            <i class="fas fa-moon"></i> <span id="themeText">Dark Mode</span>
+                        </button>
+                    </div>
+                    <div class="notification-badge position-relative">
+                        <a href="/Notification/Index" class="text-decoration-none position-relative">
+                            <i class="fas fa-bell fa-lg"></i>
+                            <span class="badge bg-danger position-absolute top-0 start-100 translate-middle p-1 rounded-circle">2</span>
+                        </a>
+                    </div>
+                    <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="user-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                                @{
+                                    var userName = Context.Session.GetString("Name");
+                                    var displayChar = !string.IsNullOrEmpty(userName) ? userName.Substring(0, 1).ToUpper() : "U";
+                                }
+                                @displayChar
+                            </div>
+                            <div class="user-info text-start">
+                                <div class="fw-bold">@(Context.Session.GetString("Name") ?? "User")</div>
+                                <div class="badge bg-secondary">@(Context.Session.GetString("Role") ?? "User")</div>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="/Profile/Index"><i class="fas fa-user me-2"></i>Profile</a></li>
+                            <li><a class="dropdown-item" href="/Login/Logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
-            <div class="pt-3">
-                <div class="container">
-                    <main role="main" class="pb-3">
-                        @RenderBody()
-                    </main>
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
+                <div class="pt-3">
+                    <div class="container">
+                        <!-- Success/Error Messages -->
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                @TempData["SuccessMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+                        
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                @TempData["ErrorMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+                        
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                يرجى تصحيح الأخطاء التالية:
+                                <ul class="mb-0 mt-2">
+                                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                </ul>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+                        
+                        <main role="main" class="pb-3">
+                            @RenderBody()
+                        </main>
+                    </div>
                 </div>
-            </div>
-        </main>
+            </main>
 
-       
+           
 
-    </div>
+        </div>
+    }
     <script>
         const currentPath = window.location.pathname.toLowerCase();
 
+        // سايد بار ديناميكي عربي/إنجليزي
+        const lang = '@(Context.Session.GetString("lang") ?? "en")';
         const sidebarItems = [
-
-            { text: "Home", icon: "fas fa-home", url: "https://localhost:7134" },
-            { text: "Inventory", icon: "fas fa-box", url: "/Asset/Inventory" },
-            { text: "Assets", icon: "fas fa-server", url: "/asset/index" },
-            { text: "Reports", icon: "fas fa-chart-bar", url: "/report/index" },
-            { text: "Employees", icon: "fas fa-users", url: "/home/employee" },
-            { text: "Chat", icon: "fas fa-comments", url: "/chat/index" },
-            { text: "Settings", icon: "fas fa-cog", url: "/profile/index" },
-            { text: "Map", icon: "fas fa-life-ring", url: "/asset/viewmap" },
-            { text: "Logout", icon: "fas fa-sign-out-alt", url: "#", isLogout: true }
+            lang === 'ar' ? { text: "الرئيسية", icon: "fas fa-home", url: "https://localhost:7134" } : { text: "Home", icon: "fas fa-home", url: "https://localhost:7134" },
+            lang === 'ar' ? { text: "المخزون", icon: "fas fa-box", url: "/Asset/Inventory" } : { text: "Inventory", icon: "fas fa-box", url: "/Asset/Inventory" },
+            lang === 'ar' ? { text: "الأصول", icon: "fas fa-server", url: "/asset/index" } : { text: "Assets", icon: "fas fa-server", url: "/asset/index" },
+            lang === 'ar' ? { text: "التقارير", icon: "fas fa-chart-bar", url: "/report/index" } : { text: "Reports", icon: "fas fa-chart-bar", url: "/report/index" },
+            lang === 'ar' ? { text: "الموظفين", icon: "fas fa-users", url: "/home/employee" } : { text: "Employees", icon: "fas fa-users", url: "/home/employee" },
+            lang === 'ar' ? { text: "الدردشة", icon: "fas fa-comments", url: "/chat/index" } : { text: "Chat", icon: "fas fa-comments", url: "/chat/index" },
+            lang === 'ar' ? { text: "الإعدادات", icon: "fas fa-cog", url: "/profile/index" } : { text: "Settings", icon: "fas fa-cog", url: "/profile/index" },
+            lang === 'ar' ? { text: "الخريطة", icon: "fas fa-life-ring", url: "/asset/viewmap" } : { text: "Map", icon: "fas fa-life-ring", url: "/asset/viewmap" },
+            lang === 'ar' ? { text: "تسجيل الخروج", icon: "fas fa-sign-out-alt", url: "#", isLogout: true } : { text: "Logout", icon: "fas fa-sign-out-alt", url: "#", isLogout: true }
         ];
-
         const sidebarMenu = document.getElementById("sidebar-menu");
-
+        sidebarMenu.innerHTML = "";
         sidebarItems.forEach(item => {
             const li = document.createElement("li");
             li.classList.add("sidebar-item");
-
-            // Mark active item
             if (currentPath === new URL(item.url, window.location.origin).pathname.toLowerCase()) {
                 li.classList.add("active");
             }
-
             const a = document.createElement("a");
             a.href = item.url;
-
             const icon = document.createElement("i");
             icon.className = item.icon;
-
             const span = document.createElement("span");
             span.textContent = item.text;
-
             a.appendChild(icon);
             a.appendChild(span);
             li.appendChild(a);
-
-            // Special handling for logout
             if (item.isLogout) {
-                li.classList.add("mt-5");
-                a.addEventListener("click", function (e) {
+                a.addEventListener('click', function(e) {
                     e.preventDefault();
-                    // Implement logout logic here
-                    alert("Logging out...");
-                    window.location.href = "/logout"; // Change as needed
+                    if (confirm('هل تريد تسجيل الخروج؟')) {
+                        window.location.href = '/Login/Logout';
+                    }
                 });
             }
-
             sidebarMenu.appendChild(li);
         });
+
+        // Global Search Functionality
+        const searchInput = document.getElementById('globalSearch');
+        const searchResults = document.getElementById('searchResults');
+        let searchTimeout;
+
+        if (searchInput && searchResults) {
+            console.log('Search elements found');
+            
+            searchInput.addEventListener('input', function() {
+                const query = this.value.trim();
+                console.log('Search input:', query);
+                
+                clearTimeout(searchTimeout);
+                
+                if (query.length < 2) {
+                    searchResults.style.display = 'none';
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    performSearch(query);
+                }, 300);
+            });
+
+            // Hide search results when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                    searchResults.style.display = 'none';
+                }
+            });
+
+            // Handle Enter key for full search
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const query = this.value.trim();
+                    if (query.length > 0) {
+                        console.log('Redirecting to search page with query:', query);
+                        window.location.href = `/Search/Index?q=${encodeURIComponent(query)}`;
+                    }
+                }
+            });
+        } else {
+            console.log('Search elements not found');
+        }
+
+        function performSearch(query) {
+            console.log('Performing search for:', query);
+            
+            fetch(`/Search/QuickSearch?term=${encodeURIComponent(query)}`)
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Search results:', data);
+                    displaySearchResults(data.results || []);
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    if (searchResults) {
+                        searchResults.innerHTML = '<div class="p-3 text-danger">خطأ في البحث: ' + error.message + '</div>';
+                        searchResults.style.display = 'block';
+                    }
+                });
+        }
+
+        function displaySearchResults(results) {
+            if (!searchResults) {
+                console.log('Search results container not found');
+                return;
+            }
+            
+            if (!results || results.length === 0) {
+                searchResults.innerHTML = '<div class="p-3 text-muted">لا توجد نتائج</div>';
+                searchResults.style.display = 'block';
+                return;
+            }
+
+            let html = '';
+            results.forEach(result => {
+                html += `
+                    <div class="search-result-item p-3 border-bottom" style="cursor: pointer;" onclick="window.location.href='${result.url}'">
+                        <div class="d-flex align-items-center">
+                            <i class="${result.icon} me-3 text-primary"></i>
+                            <div class="flex-grow-1">
+                                <div class="fw-bold">${result.title}</div>
+                                <div class="text-muted small">${result.subtitle}</div>
+                                <div class="badge bg-secondary">${result.type}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                <div class="p-2 text-center">
+                    <a href="/Search/Index?q=${encodeURIComponent(searchInput.value.trim())}" class="btn btn-sm btn-outline-primary">
+                        عرض جميع النتائج
+                    </a>
+                </div>
+            `;
+
+            searchResults.innerHTML = html;
+            searchResults.style.display = 'block';
+        }
+
+        // Sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+            });
+        }
+
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const themeText = document.getElementById('themeText');
+        const body = document.body;
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+                body.classList.toggle('dark-theme');
+                const isDark = body.classList.contains('dark-theme');
+                themeText.textContent = isDark ? 'Light Mode' : 'Dark Mode';
+                themeToggle.querySelector('i').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            });
+        }
+
+        // Language toggle functionality
+        const langEn = document.getElementById('lang-en');
+        const langAr = document.getElementById('lang-ar');
+
+        if (langEn && langAr) {
+            langEn.addEventListener('click', function() {
+                // Set language to English
+                fetch('/Home/SetLanguage?lang=en', { method: 'POST' })
+                    .then(() => window.location.reload());
+            });
+
+            langAr.addEventListener('click', function() {
+                // Set language to Arabic
+                fetch('/Home/SetLanguage?lang=ar', { method: 'POST' })
+                    .then(() => window.location.reload());
+            });
+        }
     </script>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -134,3 +335,218 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+<script>
+// Language Switcher
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('lang-en').onclick = function() {
+        fetch('/Home/SetLanguage?lang=en').then(() => location.reload());
+    };
+    document.getElementById('lang-ar').onclick = function() {
+        fetch('/Home/SetLanguage?lang=ar').then(() => location.reload());
+    };
+
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    const themeText = document.getElementById('themeText');
+    let dark = localStorage.getItem('theme') === 'dark';
+    setTheme(dark);
+    themeToggle.onclick = function() {
+        dark = !dark;
+        setTheme(dark);
+        localStorage.setItem('theme', dark ? 'dark' : 'light');
+    };
+    function setTheme(isDark) {
+        if(isDark) {
+            document.body.classList.add('dark-mode');
+            themeText.textContent = 'Light Mode';
+            themeToggle.querySelector('i').className = 'fas fa-sun';
+        } else {
+            document.body.classList.remove('dark-mode');
+            themeText.textContent = 'Dark Mode';
+            themeToggle.querySelector('i').className = 'fas fa-moon';
+        }
+    }
+});
+</script>
+<style>
+body.dark-mode {
+    background: #0f0f0f !important;
+    color: #e0e0e0 !important;
+}
+body.dark-mode .main-content, body.dark-mode .top-navbar {
+    background: #1a1a1a !important;
+    color: #e0e0e0 !important;
+}
+body.dark-mode .sidebar {
+    background: #1a1a1a !important;
+    border-right: 1px solid #333 !important;
+}
+body.dark-mode .sidebar-menu .sidebar-item {
+    color: #ccc !important;
+}
+body.dark-mode .sidebar-menu .sidebar-item.active, body.dark-mode .sidebar-menu .sidebar-item:hover {
+    background: #2a2a2a !important;
+    color: #fff !important;
+    border-left: 4px solid #6366f1 !important;
+}
+body.dark-mode .logo-container {
+    color: #fff !important;
+    border-bottom: 1px solid #333 !important;
+}
+body.dark-mode .search-bar, body.dark-mode .form-control, body.dark-mode .form-select {
+    background: #2a2a2a !important;
+    color: #fff !important;
+    border-color: #444 !important;
+}
+body.dark-mode .login-container, body.dark-mode .report-card, body.dark-mode .employee-list, body.dark-mode .asset-card, body.dark-mode .form-container {
+    background: #1a1a1a !important;
+    color: #fff !important;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.8);
+}
+body.dark-mode .btn-primary {
+    background: #6366f1;
+    border: none;
+}
+body.dark-mode .btn-primary:hover {
+    background: #4f46e5;
+}
+body.dark-mode .dropdown-menu {
+    background: #2a2a2a !important;
+    color: #fff !important;
+}
+body.dark-mode .dropdown-item {
+    color: #fff !important;
+}
+body.dark-mode .dropdown-item:hover {
+    background: #3a3a3a !important;
+    color: #fff !important;
+}
+body.dark-mode .badge {
+    background: #6366f1 !important;
+    color: #fff !important;
+}
+/* ألوان الأرقام والكروت */
+body.dark-mode .stat-card, body.dark-mode .card {
+    background: #1a1a1a !important;
+    color: #fff !important;
+    border: 1px solid #333 !important;
+}
+body.dark-mode .fs-3, body.dark-mode .text-3xl {
+    color: #6366f1 !important;
+}
+body.dark-mode .fw-bold {
+    color: #fff !important;
+}
+body.dark-mode .text-muted {
+    color: #aaa !important;
+}
+/* ألوان الجداول */
+body.dark-mode table {
+    background: #1a1a1a !important;
+    color: #fff !important;
+}
+body.dark-mode .table {
+    color: #fff !important;
+}
+body.dark-mode .table th {
+    background: #2a2a2a !important;
+    color: #fff !important;
+    border-color: #444 !important;
+}
+body.dark-mode .table td {
+    border-color: #333 !important;
+    color: #fff !important;
+}
+body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #2a2a2a !important;
+}
+/* ألوان الكروت الإحصائية */
+body.dark-mode .bg-blue-50 {
+    background: #1e3a8a !important;
+    color: #fff !important;
+}
+body.dark-mode .bg-red-50 {
+    background: #7f1d1d !important;
+    color: #fff !important;
+}
+body.dark-mode .bg-yellow-50 {
+    background: #78350f !important;
+    color: #fff !important;
+}
+body.dark-mode .bg-green-50 {
+    background: #14532d !important;
+    color: #fff !important;
+}
+body.dark-mode .text-blue-600, body.dark-mode .text-blue-800 {
+    color: #60a5fa !important;
+}
+body.dark-mode .text-red-600, body.dark-mode .text-red-800 {
+    color: #f87171 !important;
+}
+body.dark-mode .text-yellow-600, body.dark-mode .text-yellow-800 {
+    color: #fbbf24 !important;
+}
+body.dark-mode .text-green-600, body.dark-mode .text-green-800 {
+    color: #4ade80 !important;
+}
+/* ألوان النصوص */
+body.dark-mode .text-gray-600 {
+    color: #aaa !important;
+}
+body.dark-mode .text-gray-800 {
+    color: #e0e0e0 !important;
+}
+body.dark-mode .text-gray-500 {
+    color: #888 !important;
+}
+/* ألوان الخلفيات */
+body.dark-mode .bg-white {
+    background: #1a1a1a !important;
+}
+body.dark-mode .bg-gray-50 {
+    background: #0f0f0f !important;
+}
+/* ألوان الأزرار */
+body.dark-mode .btn-outline-secondary {
+    background: #2a2a2a !important;
+    border-color: #444 !important;
+    color: #fff !important;
+}
+body.dark-mode .btn-outline-secondary:hover {
+    background: #3a3a3a !important;
+    color: #fff !important;
+}
+/* ألوان النوافذ المنبثقة */
+body.dark-mode .modal-content {
+    background: #1a1a1a !important;
+    color: #fff !important;
+}
+body.dark-mode .modal-header {
+    border-bottom: 1px solid #333 !important;
+}
+body.dark-mode .modal-footer {
+    border-top: 1px solid #333 !important;
+}
+/* ألوان التنبيهات */
+body.dark-mode .alert-danger {
+    background: #7f1d1d !important;
+    color: #f87171 !important;
+    border-color: #dc2626 !important;
+}
+body.dark-mode .alert-success {
+    background: #14532d !important;
+    color: #4ade80 !important;
+    border-color: #16a34a !important;
+}
+body.dark-mode .alert-warning {
+    background: #78350f !important;
+    color: #fbbf24 !important;
+    border-color: #d97706 !important;
+}
+body.dark-mode .alert-info {
+    background: #1e3a8a !important;
+    color: #60a5fa !important;
+    border-color: #2563eb !important;
+}
+</style>
