@@ -47,7 +47,7 @@ namespace Capstone_Next_Step.Controllers
                 Console.WriteLine($"Error in AddReport: {ex.Message}");
                 ViewBag.Users = new List<User>();
                 ViewBag.Assets = new List<Asset>();
-                return View();
+            return View();
             }
         }
             
