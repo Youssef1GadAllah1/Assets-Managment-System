@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Capstone_Next_Step.Data;
+using Capstone_Next_Step.Models;
 
 namespace Capstone_Next_Step.Controllers
 {
@@ -11,67 +12,45 @@ namespace Capstone_Next_Step.Controllers
         {
             _context = context;
         }
+
+        [HttpGet("api/notifications/unread-count")]
+        public IActionResult UnreadCount()
+        {
+            var userName = HttpContext.Session.GetString("UserName");
+            if (string.IsNullOrEmpty(userName)) return Json(new { count = 0 });
+            var count = _context.Notifications.Count(n => n.UserName == userName && !n.IsRead);
+            return Json(new { count });
+        }
         
         public IActionResult Index()
         {
             try
             {
-                // Get notifications for current user
                 var userName = HttpContext.Session.GetString("UserName");
-                var notifications = GetNotificationsForUser(userName);
-                
+                if (string.IsNullOrEmpty(userName))
+                {
+                    return RedirectToAction("Login", "Login");
+                }
+
+                var notifications = _context.Notifications
+                    .Where(n => n.UserName == userName)
+                    .OrderByDescending(n => n.CreatedAt)
+                    .ToList();
+
+                // Mark all as read once user opens notifications page
+                foreach (var n in notifications.Where(n => !n.IsRead))
+                {
+                    n.IsRead = true;
+                }
+                _context.SaveChanges();
+
                 return View(notifications);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in Notification/Index: {ex.Message}");
-                return View(new List<object>());
+                return View(new List<Notification>());
             }
-        }
-
-        private List<object> GetNotificationsForUser(string userName)
-        {
-            var notifications = new List<object>();
-
-            try
-            {
-                // Add sample notifications (in real app, these would come from database)
-                notifications.Add(new
-                {
-                    Id = 1,
-                    Title = "تم إضافة أصل جديد",
-                    Message = "تم إضافة أصل جديد إلى النظام",
-                    Type = "info",
-                    Time = DateTime.Now.AddMinutes(-5).ToString("HH:mm"),
-                    IsRead = false
-                });
-
-                notifications.Add(new
-                {
-                    Id = 2,
-                    Title = "تقرير جاهز",
-                    Message = "تم إنشاء التقرير الشهري بنجاح",
-                    Type = "success",
-                    Time = DateTime.Now.AddMinutes(-15).ToString("HH:mm"),
-                    IsRead = true
-                });
-
-                notifications.Add(new
-                {
-                    Id = 3,
-                    Title = "تنبيه مهم",
-                    Message = "يوجد أصول تحتاج صيانة",
-                    Type = "warning",
-                    Time = DateTime.Now.AddMinutes(-30).ToString("HH:mm"),
-                    IsRead = false
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error getting notifications: {ex.Message}");
-            }
-
-            return notifications;
         }
 
         [HttpPost]
@@ -79,13 +58,19 @@ namespace Capstone_Next_Step.Controllers
         {
             try
             {
-                // In real app, update notification status in database
-                return Json(new { success = true, message = "تم تحديث حالة الإشعار" });
+                var notif = _context.Notifications.FirstOrDefault(n => n.Id == notificationId);
+                if (notif == null)
+                {
+                    return Json(new { success = false });
+                }
+                notif.IsRead = true;
+                _context.SaveChanges();
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error marking notification as read: {ex.Message}");
-                return Json(new { success = false, message = "حدث خطأ في تحديث الإشعار" });
+                return Json(new { success = false });
             }
         }
 
@@ -94,14 +79,36 @@ namespace Capstone_Next_Step.Controllers
         {
             try
             {
-                // In real app, delete notification from database
-                return Json(new { success = true, message = "تم حذف الإشعار" });
+                var notif = _context.Notifications.FirstOrDefault(n => n.Id == notificationId);
+                if (notif == null)
+                {
+                    return Json(new { success = false });
+                }
+                _context.Notifications.Remove(notif);
+                _context.SaveChanges();
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error deleting notification: {ex.Message}");
-                return Json(new { success = false, message = "حدث خطأ في حذف الإشعار" });
+                return Json(new { success = false });
             }
+        }
+
+        // Helper to create notifications from other actions
+        [NonAction]
+        public void CreateNotification(string userName, string title, string message, string type = "info", string? linkUrl = null)
+        {
+            var notif = new Notification
+            {
+                UserName = userName,
+                Title = title,
+                Message = message,
+                Type = type,
+                LinkUrl = linkUrl
+            };
+            _context.Notifications.Add(notif);
+            _context.SaveChanges();
         }
     }
 }

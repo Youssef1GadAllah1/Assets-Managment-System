@@ -68,7 +68,6 @@ namespace Capstone_Next_Step.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
@@ -123,6 +122,44 @@ namespace Capstone_Next_Step.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("DTasks");
+                });
+
+            modelBuilder.Entity("Capstone_Next_Step.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LinkUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Capstone_Next_Step.Models.Product", b =>
@@ -201,6 +238,8 @@ namespace Capstone_Next_Step.Migrations
 
                     b.HasIndex("AssetId");
 
+                    b.HasIndex("CreatedById");
+
                     b.ToTable("Reports");
                 });
 
@@ -232,7 +271,6 @@ namespace Capstone_Next_Step.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("ProfileImage")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
@@ -256,7 +294,15 @@ namespace Capstone_Next_Step.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Capstone_Next_Step.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Asset");
+
+                    b.Navigation("User");
                 });
 #pragma warning restore 612, 618
         }

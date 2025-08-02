@@ -1,10 +1,12 @@
-﻿<div class="form-container">
+﻿@model Capstone_Next_Step.Models.Report
+
+<div class="form-container">
     <h4 class="mb-4">Add report</h4>
     
     @if (!ViewData.ModelState.IsValid)
     {
         <div class="alert alert-danger">
-            <h6>Please correct the following errors:</h6>
+            <h6>يرجى تصحيح الأخطاء التالية:</h6>
             <ul class="mb-0">
                 @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
                 {
@@ -16,14 +18,17 @@
     
     <form action="AddReportForm" method="post">
         <div class="mb-3">
-            <input type="text" name="Title" class="form-control" placeholder="Title" required>
+            <label for="Title" class="form-label">Title</label>
+            <input type="text" name="Title" class="form-control" placeholder="Enter report title" value="@Model.Title" required>
         </div>
         <div class="mb-3">
-            <input type="text" name="Description" class="form-control" placeholder="Description" required>
+            <label for="Description" class="form-label">Description</label>
+            <input type="text" name="Description" class="form-control" placeholder="Enter report description" value="@Model.Description" required>
         </div>
        
         <div class="mb-3">
-            <input type="text" name="Author" class="form-control" placeholder="Author" value="@Context.Session.GetString("Name")" required>
+            <label for="Author" class="form-label">Author</label>
+            <input type="text" name="Author" class="form-control" placeholder="Author" value="@(Model.Author ?? Context.Session.GetString("Name"))" required>
         </div>
         <div class="mb-3">
             <label for="userIdSelect" class="form-label">Created By</label>
@@ -33,7 +38,14 @@
                 {
                     @foreach (var user in ViewBag.Users)
                     {
-                        <option value="@user.Id">@user.Name (@user.UserName)</option>
+                        if (Model.CreatedById == user.Id)
+                        {
+                            <option value="@user.Id" selected>@user.Name (@user.UserName)</option>
+                        }
+                        else
+                        {
+                            <option value="@user.Id">@user.Name (@user.UserName)</option>
+                        }
                     }
                 }
             </select>
@@ -41,23 +53,33 @@
         <div class="mb-3">
             <label for="assetIdSelect" class="form-label">Asset</label>
             <select name="AssetId" class="form-select" id="assetIdSelect" required>
-                <option value="" selected disabled>choose asset</option>
+                <option value="" selected disabled>اختر الأصل</option>
                 @if (ViewBag.Assets != null)
                 {
                     @foreach (var asset in ViewBag.Assets)
                     {
-                        <option value="@asset.Id">@asset.Name - @asset.Category</option>
+                        if (Model.AssetId == asset.Id)
+                        {
+                            <option value="@asset.Id" selected>@asset.Name - @asset.Category</option>
+                        }
+                        else
+                        {
+                            <option value="@asset.Id">@asset.Name - @asset.Category</option>
+                        }
                     }
                 }
             </select>
         </div>
         <div class="mb-4">
-            <textarea name="ReportContant" class="form-control" placeholder="Enter your report" required></textarea>
+            <label for="ReportContant" class="form-label">Report Content</label>
+            <textarea name="ReportContant" class="form-control" placeholder="Enter your report content" rows="5" required>@Model.ReportContant</textarea>
         </div>
         <div class="text-center">
             <button type="submit" class="btn btn-primary">Add</button>
         </div>
     </form>
 </div>
+
+
    
 

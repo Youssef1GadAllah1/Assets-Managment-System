@@ -22,6 +22,7 @@ namespace Capstone_Next_Step.Data
         public DbSet<Report> Reports { get; set; }
         public DbSet<DTask> DTasks { get; set; }  
         public DbSet<Product> Products { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
        
     }
 }

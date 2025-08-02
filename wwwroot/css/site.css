@@ -271,6 +271,12 @@ body {
     color: #444;
     line-height: 1.5;
 }
+.clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 
 .hamburger {
     display: none;
@@ -915,12 +921,21 @@ body {
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    object-fit: cover;
+    overflow: hidden;
     border: 3px solid #e6eeff;
     background-color: #f0f0f0;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Ensure the image fits within the circle and doesn't overflow */
+.profile-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
 }
 
 .profile-photo-upload {
@@ -1310,6 +1325,28 @@ body {
     border-radius: 10px;
 }
 
+/* Dark mode styles for Asset Summary block (ViewMap) */
+body.dark-mode #assetSummaryCard {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+}
+body.dark-mode #assetSummaryTitle { color: var(--text) !important; }
+body.dark-mode #assetSummary .bg-blue-50,
+body.dark-mode #assetSummary .bg-red-50,
+body.dark-mode #assetSummary .bg-yellow-50 {
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
+}
+body.dark-mode #assetSummary .text-blue-800,
+body.dark-mode #assetSummary .text-red-800,
+body.dark-mode #assetSummary .text-yellow-800 { color: var(--text) !important; }
+body.dark-mode #assetSummary .text-blue-600 { color: #9ab7ff !important; }
+body.dark-mode #assetSummary .text-red-600 { color: #ff9a9a !important; }
+body.dark-mode #assetSummary .text-yellow-600 { color: #ffd17a !important; }
+body.dark-mode #assetSummary .text-blue-500,
+body.dark-mode #assetSummary .text-red-500,
+body.dark-mode #assetSummary .text-yellow-500 { color: var(--muted) !important; }
+
 .asset {
     position: absolute;
     background-color: rgba(255, 255, 255, 0.9);
@@ -1414,4 +1451,197 @@ body {
 
 #searchResults {
     animation: slideDown 0.3s ease;
+}
+
+/* Dark mode search bar styling */
+body.dark-mode .search-bar .form-control {
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+}
+/* Make outer search container dark/transparent in dark mode */
+body.dark-mode .search-bar {
+  background: transparent !important;
+  border: none !important;
+}
+body.dark-mode .search-bar i { color: var(--primary-2) !important; }
+body.dark-mode #searchResults {
+  background: var(--surface) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+/* Modern Dark Mode - centralized in CSS for consistency */
+body.dark-mode {
+  --bg: #0b1020;
+  --surface: #121a2b;
+  --surface-2: #0f1625;
+  --border: #1f2a3f;
+  --text: #e6edf3;
+  --muted: #9aa7b3;
+  --primary: #4f46e5;
+  --primary-2: #6366f1;
+  background: linear-gradient(180deg, #0b1020 0%, #0a0f1c 100%);
+  color: var(--text);
+}
+
+body.dark-mode .top-navbar {
+  background: rgba(18,26,43,0.8) !important;
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border) !important;
+}
+
+body.dark-mode .sidebar {
+  background: var(--surface) !important;
+  border-right: 1px solid var(--border) !important;
+}
+
+body.dark-mode .sidebar-item { color: var(--muted) !important; }
+body.dark-mode .sidebar-item:hover,
+body.dark-mode .sidebar-item.active {
+  background: linear-gradient(90deg, rgba(99,102,241,0.12), rgba(79,70,229,0.06));
+  color: var(--text) !important;
+  border-left: 4px solid var(--primary-2) !important;
+}
+
+body.dark-mode .main-content {
+  background: transparent !important;
+}
+
+body.dark-mode .form-container,
+body.dark-mode .report-card,
+body.dark-mode .employee-list,
+body.dark-mode .asset-card,
+body.dark-mode .card,
+body.dark-mode .stat-card,
+body.dark-mode .task-item,
+body.dark-mode .chat-messages,
+body.dark-mode .chat-input {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 10px 30px rgba(3,7,18,0.45) !important;
+  color: var(--text) !important;
+}
+
+body.dark-mode .form-label { color: var(--muted) !important; }
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+  background: var(--surface-2) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+body.dark-mode .form-control:focus {
+  border-color: var(--primary-2) !important;
+  box-shadow: 0 0 0 0.2rem rgba(99,102,241,0.25) !important;
+}
+
+body.dark-mode .btn-save,
+body.dark-mode .btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-2)) !important;
+  border: none !important;
+}
+body.dark-mode .btn-primary:hover,
+body.dark-mode .btn-save:hover {
+  filter: brightness(1.1);
+}
+
+body.dark-mode .dropdown-menu {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+}
+body.dark-mode .dropdown-item { color: var(--text) !important; }
+body.dark-mode .dropdown-item:hover { background: var(--surface-2) !important; }
+
+/* Tables */
+body.dark-mode .table { color: var(--text) !important; }
+body.dark-mode .table th { background: var(--surface-2) !important; border-color: var(--border) !important; }
+body.dark-mode .table td { border-color: var(--border) !important; }
+body.dark-mode .table-striped tbody tr:nth-of-type(odd) { background: rgba(255,255,255,0.02) !important; }
+
+/* Alerts */
+body.dark-mode .alert-danger { background: #2a0f14 !important; color: #ffb4b4 !important; border-color: #7f1d1d !important; }
+body.dark-mode .alert-success { background: #102215 !important; color: #9be7b0 !important; border-color: #14532d !important; }
+body.dark-mode .alert-warning { background: #2a1c0a !important; color: #ffd48a !important; border-color: #78350f !important; }
+body.dark-mode .alert-info { background: #0f1c2e !important; color: #9cc1ff !important; border-color: #1e3a8a !important; }
+
+/* Dark mode polish: smooth transitions, hover elevation, sidebar accent, links, scrollbar */
+body.dark-mode .top-navbar,
+body.dark-mode .sidebar,
+body.dark-mode .form-container,
+body.dark-mode .report-card,
+body.dark-mode .employee-list,
+body.dark-mode .asset-card,
+body.dark-mode .card,
+body.dark-mode .stat-card,
+body.dark-mode .task-item,
+body.dark-mode .chat-messages,
+body.dark-mode .chat-input,
+body.dark-mode .form-control,
+body.dark-mode .form-select,
+body.dark-mode .dropdown-menu,
+body.dark-mode .btn,
+body.dark-mode .table,
+body.dark-mode .table th,
+body.dark-mode .table td {
+  transition: background-color .25s ease, color .25s ease, border-color .25s ease, box-shadow .25s ease, transform .15s ease;
+}
+
+body.dark-mode .card:hover,
+body.dark-mode .form-container:hover,
+body.dark-mode .report-card:hover,
+body.dark-mode .asset-card:hover,
+body.dark-mode .employee-list:hover,
+body.dark-mode .task-item:hover {
+  box-shadow: 0 16px 48px rgba(3,7,18,0.6) !important;
+  transform: translateY(-1px);
+}
+
+/* Sidebar accent bar */
+body.dark-mode .sidebar-item.active {
+  position: relative;
+}
+body.dark-mode .sidebar-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--primary-2), var(--primary));
+}
+
+/* Links */
+body.dark-mode a { color: #a9b9ff; }
+body.dark-mode a:hover { color: #c3d0ff; }
+
+/* Scrollbar */
+body.dark-mode ::-webkit-scrollbar { width: 10px; height: 10px; }
+body.dark-mode ::-webkit-scrollbar-track { background: var(--surface); }
+body.dark-mode ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--primary-2), var(--primary));
+  border-radius: 8px;
+  border: 2px solid var(--surface);
+}
+body.dark-mode ::-webkit-scrollbar-thumb:hover { filter: brightness(1.1); }
+
+/* Reports page specific (dark mode) */
+body.dark-mode .page-title h4 { color: var(--text) !important; }
+body.dark-mode .add-report-btn {
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  border-radius: 10px !important;
+}
+body.dark-mode .add-report-btn:hover {
+  background: linear-gradient(135deg, var(--primary), var(--primary-2)) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+}
+body.dark-mode .report-title { color: var(--text) !important; }
+body.dark-mode .report-date { color: var(--muted) !important; }
+body.dark-mode .report-author {
+  background: var(--surface-2) !important;
+  border: 1px solid var(--border) !important;
 }

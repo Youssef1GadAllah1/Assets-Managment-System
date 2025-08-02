@@ -9,8 +9,13 @@ namespace Capstone_Next_Step
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
-			// Add services to the container
-			builder.Services.AddControllersWithViews();
+            // Add services to the container
+            builder.Services.AddControllersWithViews(options =>
+            {
+                // Allow non-posted non-nullable reference type properties to be treated as optional
+                // This prevents implicit "field is required" validation for properties not present in the form
+                options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;
+            });
 			builder.Services.AddSession(options =>
 			{
 				options.IdleTimeout = TimeSpan.FromMinutes(30);

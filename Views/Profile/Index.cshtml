@@ -1,17 +1,47 @@
-﻿@model IEnumerable<Capstone_Next_Step.Models.User>
+﻿@model Capstone_Next_Step.Models.User
 
 <div class="form-container">
-    <form id="profileForm">
-        <!-- Profile Photo -->
-        <div class="profile-photo-container">
-            <div class="profile-photo" id="profilePhotoPreview">
-                <i class="fas fa-user fa-3x text-muted"></i>
-            </div>
-            <label for="fileInput" class="profile-photo-upload">
-                <i class="fas fa-camera"></i>
-            </label>
-            <input  type="file" id="fileInput" accept="image/*">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
         </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+    
+    <!-- Profile Photo (standalone upload form) -->
+    <div class="profile-photo-container mb-3">
+        <div class="profile-photo" id="profilePhotoPreview">
+            @{
+                var profileImg = string.IsNullOrEmpty(Model.ProfileImage)
+                    ? Context.Session.GetString("ProfileImage")
+                    : Model.ProfileImage;
+            }
+            @if (!string.IsNullOrEmpty(profileImg))
+            {
+                <img src="@profileImg" alt="Profile" />
+            }
+            else
+            {
+                <i class="fas fa-user fa-3x text-muted"></i>
+            }
+        </div>
+        <label for="profileImage" class="profile-photo-upload">
+            <i class="fas fa-camera"></i>
+        </label>
+        <form asp-action="UploadProfileImage" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <input type="file" id="profileImage" name="profileImage" accept="image/*" onchange="this.form.submit()" style="display:none" />
+        </form>
+    </div>
+
+    <form asp-action="UpdateProfile" method="post" id="profileForm">
+        <input type="hidden" asp-for="Id" />
 
         <div class="user-name-display mb-4" id="photoUserName"></div>
 
@@ -20,17 +50,22 @@
 
         <div class="mb-3">
             <label for="fullName" class="form-label">FULL NAME</label>
-            <input type="text" name="Name" class="form-control" id="fullName" placeholder="Enter your full name" value="">
+            <input type="text" asp-for="Name" class="form-control" id="fullName" placeholder="Enter your full name">
         </div>
 
         <div class="mb-3">
             <label for="phoneNumber" class="form-label">PHONE</label>
-            <input type="tel" name="PhoneNamber" class="form-control" id="phoneNumber" placeholder="Enter your phone number">
+            <input type="tel" asp-for="PhoneNamber" class="form-control" id="phoneNumber" placeholder="Enter your phone number">
         </div>
 
         <div class="mb-3">
             <label for="email" class="form-label">EMAIL</label>
-            <input type="email" name="Email" class="form-control" id="email" placeholder="Enter your email">
+            <input type="email" asp-for="Email" class="form-control" id="email" placeholder="Enter your email">
+        </div>
+
+        <div class="mb-3">
+            <label for="jobTitle" class="form-label">JOB TITLE</label>
+            <input type="text" asp-for="JobTitle" class="form-control" id="jobTitle" placeholder="Enter your job title">
         </div>
 
         <div class="mb-4">
@@ -82,4 +117,6 @@
         </div>
     </form>
 </div>
+
+
       

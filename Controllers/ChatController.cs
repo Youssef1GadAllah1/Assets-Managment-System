@@ -23,7 +23,8 @@ namespace Capstone_Next_Step.Controllers
         {
             try
             {
-                string userMessage = request.Message?.ToLower() ?? "";
+                var raw = request.Message ?? string.Empty;
+                string userMessage = raw.ToLower();
                 string botResponse;
 
                 // Validate input
@@ -73,7 +74,25 @@ namespace Capstone_Next_Step.Controllers
                 }
                 else
                 {
-                    botResponse = "أعتذر، لم أفهم رسالتك. هل يمكنك إعادة صياغتها أو سؤالي عن شيء محدد؟";
+                    // Simple multilingual fallback using keyword intents
+                    // Try to detect common intents dynamically
+                    if (userMessage.Contains("help") || userMessage.Contains("مساعدة") || userMessage.Contains("ازاي"))
+                    {
+                        botResponse = "I can help with assets, reports, and users. يمكنك سؤالي عن الأصول، التقارير والمستخدمين.";
+                    }
+                    else if (userMessage.Contains("where") && (userMessage.Contains("report") || userMessage.Contains("تقرير")))
+                    {
+                        botResponse = "Open Reports page to add or view reports. افتح صفحة التقارير لإضافة أو عرض التقارير.";
+                    }
+                    else if (userMessage.Contains("password") || userMessage.Contains("باسورد") || userMessage.Contains("كلمة السر"))
+                    {
+                        botResponse = "Password changes are handled by admin for now. تغيير كلمة السر من خلال المشرف حالياً.";
+                    }
+                    else
+                    {
+                        // Echo back with a generic helpful response (English + Arabic)
+                        botResponse = $"You said: '{raw}'. I'm learning. Ask me about assets, reports, users or help. قلت: '{raw}'. ما زلت أتعلم، اسألني عن الأصول أو التقارير أو المستخدمين أو اكتب 'help / مساعدة'.";
+                    }
                 }
 
                 return Json(new { 

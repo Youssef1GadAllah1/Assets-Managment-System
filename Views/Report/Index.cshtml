@@ -1,34 +1,47 @@
 ﻿@model IEnumerable<Capstone_Next_Step.Models.Report>
 
 <div class="container-fluid mt-4">
-    <div class="page-title">
-        <h4>Reports Lists</h4>
-        <form action="AddReport" method="post">
-        <button class="add-report-btn">
-            Add Report
+    @{ var isArabic = Context.Session.GetString("lang") == "ar"; }
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    <div class="page-title" dir="@(isArabic ? "rtl" : "ltr")">
+        <h4>@(isArabic ? "قائمة التقارير" : "Reports Lists")</h4>
+        <a href="@Url.Action("AddReport")" class="add-report-btn">
+            @(isArabic ? "إضافة تقرير" : "Add Report")
             <i class="fas fa-pen"></i>
-            </button>
-        </form>
+        </a>
     </div>
 
     <!-- Reports Container -->
     <div class="reports-container">
 
 
-        @foreach (var ReportList in Model) {
-            <div class="report-card">
-                <div class="report-header">
-                <div class="report-title">@ReportList.Title</div>
-                <div class="report-date">@ReportList.Created</div>
-                <div class="report-author">
-                    <div class="author-dot"></div>
-                    <span>@ReportList.Author</span>
+        @if (!Model.Any())
+        {
+            <div class="text-muted" style="opacity:.8">@(isArabic ? "لا توجد تقارير" : "No reports yet")</div>
+        }
+        else
+        {
+            foreach (var ReportList in Model)
+            {
+                <div class="report-card">
+                    <div class="report-header">
+                        <div class="report-title">@ReportList.Title</div>
+                        <div class="report-date">@ReportList.Created.ToLocalTime().ToString("g")</div>
+                        <div class="report-author">
+                            <div class="author-dot"></div>
+                            <span>@ReportList.Author</span>
+                        </div>
+                    </div>
+                    <div class="report-content clamp-2">
+                        @ReportList.ReportContant
+                    </div>
                 </div>
-            </div>
-            <div class="report-content">
-              @ReportList.ReportContant
-            </div>
-        </div>
+            }
         }
 </div>
 </div>

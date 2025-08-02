@@ -154,13 +154,15 @@ namespace Capstone_Next_Step.Controllers
                 _appDbContext.Users.Add(user);
                 _appDbContext.SaveChanges();
 
-                TempData["SuccessMessage"] = "تم إضافة الموظف بنجاح";
+                var isArabic = HttpContext.Session.GetString("lang") == "ar";
+                TempData["SuccessMessage"] = isArabic ? "تم إضافة الموظف بنجاح" : "Employee added successfully";
                 return RedirectToAction("Employee");
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error adding employee");
-                ModelState.AddModelError("", "حدث خطأ أثناء إضافة الموظف");
+                var isArabic2 = HttpContext.Session.GetString("lang") == "ar";
+                ModelState.AddModelError("", isArabic2 ? "حدث خطأ أثناء إضافة الموظف" : "An error occurred while adding the employee");
                 return View(user);
             }
         }

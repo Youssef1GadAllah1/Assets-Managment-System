@@ -34,20 +34,27 @@ namespace Capstone_Next_Step.Controllers
         {
             try
             {
+                // Check if user is logged in
+                var currentUserName = HttpContext.Session.GetString("UserName");
+                if (string.IsNullOrEmpty(currentUserName))
+                {
+                    return RedirectToAction("Login", "Login");
+                }
+
                 // Get all users and assets for the dropdowns
                 var users = _appDbContext.Users.ToList();
                 var assets = _appDbContext.Assets.ToList();
                 
                 ViewBag.Users = users;
                 ViewBag.Assets = assets;
-                return View();
+                return View(new Report()); // Pass empty model
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in AddReport: {ex.Message}");
                 ViewBag.Users = new List<User>();
                 ViewBag.Assets = new List<Asset>();
-            return View();
+                return View(new Report()); // Pass empty model
             }
         }
             
@@ -56,6 +63,13 @@ namespace Capstone_Next_Step.Controllers
         {
             try
             {
+                // Check if user is logged in
+                var currentUserName = HttpContext.Session.GetString("UserName");
+                if (string.IsNullOrEmpty(currentUserName))
+                {
+                    return RedirectToAction("Login", "Login");
+                }
+
                 if (!ModelState.IsValid)
                 {
                     // Get users and assets for the dropdowns when returning with errors
@@ -82,7 +96,7 @@ namespace Capstone_Next_Step.Controllers
                 var user = _appDbContext.Users.FirstOrDefault(u => u.Id == report.CreatedById);
                 if (user == null)
                 {
-                    ModelState.AddModelError("CreatedById", "Please select a valid user");
+                    ModelState.AddModelError("CreatedById", "يرجى اختيار مستخدم صحيح");
                     var users = _appDbContext.Users.ToList();
                     var assets = _appDbContext.Assets.ToList();
                     ViewBag.Users = users;
@@ -94,7 +108,7 @@ namespace Capstone_Next_Step.Controllers
                 var asset = _appDbContext.Assets.FirstOrDefault(a => a.Id == report.AssetId);
                 if (asset == null)
                 {
-                    ModelState.AddModelError("AssetId", "Please select a valid origin.");
+                    ModelState.AddModelError("AssetId", "يرجى اختيار أصل صحيح");
                     var users = _appDbContext.Users.ToList();
                     var assets = _appDbContext.Assets.ToList();
                     ViewBag.Users = users;
@@ -105,13 +119,20 @@ namespace Capstone_Next_Step.Controllers
                 _appDbContext.Reports.Add(report);
                 _appDbContext.SaveChanges();
 
-                TempData["SuccessMessage"] = "Report added successfully!";
+                var isArabic = HttpContext.Session.GetString("lang") == "ar";
+                TempData["SuccessMessage"] = isArabic ? "تم إضافة التقرير بنجاح!" : "Report added successfully!";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error adding report: {ex.Message}");
-                ModelState.AddModelError("", "An error occurred while adding the report.");
+                ModelState.AddModelError("", "حدث خطأ أثناء إضافة التقرير");
+                
+                // Get users and assets for the dropdowns when returning with errors
+                var users = _appDbContext.Users.ToList();
+                var assets = _appDbContext.Assets.ToList();
+                ViewBag.Users = users;
+                ViewBag.Assets = assets;
                 return View("AddReport", report);
             }
         }

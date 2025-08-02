@@ -31,6 +31,12 @@ namespace Capstone_Next_Step.Controllers
                     return RedirectToAction("Login", "Login");
                 }
 
+                // Ensure navbar shows latest profile image
+                if (!string.IsNullOrEmpty(currentUser.ProfileImage))
+                {
+                    HttpContext.Session.SetString("ProfileImage", currentUser.ProfileImage);
+                }
+
                 return View(currentUser);
             }
             catch (Exception ex)
@@ -111,8 +117,13 @@ namespace Capstone_Next_Step.Controllers
                 user.ProfileImage = "/Image/Profile/" + uniqueFileName;
                 _context.SaveChanges();
 
-                TempData["SuccessMessage"] = "تم تحديث صورة البروفايل بنجاح";
-                return RedirectToAction("Details", new { id = id });
+                // Update session so navbar can show the new photo
+                HttpContext.Session.SetString("ProfileImage", user.ProfileImage ?? string.Empty);
+
+                var isArabic = HttpContext.Session.GetString("lang") == "ar";
+                TempData["SuccessMessage"] = isArabic ? "تم تحديث صورة الملف الشخصي بنجاح" : "Profile photo updated successfully";
+                // redirect back to profile page to refresh avatar
+                return RedirectToAction("Index", "Profile");
             }
             catch (Exception ex)
             {
@@ -127,8 +138,23 @@ namespace Capstone_Next_Step.Controllers
         {
             try
             {
+                // These fields are not part of the posted form; prevent automatic required validation
+                ModelState.Remove("UserName");
+                ModelState.Remove("Password");
+                ModelState.Remove("Role");
+                ModelState.Remove("JobTitle");
+
                 if (!ModelState.IsValid)
                 {
+                    // Get the current user data to populate the form
+                    var currentUser = _context.Users.FirstOrDefault(u => u.Id == user.Id);
+                    if (currentUser != null)
+                    {
+                        user.UserName = currentUser.UserName;
+                        user.Password = currentUser.Password;
+                        user.Role = currentUser.Role;
+                        user.ProfileImage = currentUser.ProfileImage;
+                    }
                     return View("Index", user);
                 }
 
@@ -138,21 +164,45 @@ namespace Capstone_Next_Step.Controllers
                     return NotFound();
                 }
 
-                // Update user properties
-                existingUser.Name = user.Name;
-                existingUser.Email = user.Email;
-                existingUser.PhoneNamber = user.PhoneNamber;
-                existingUser.JobTitle = user.JobTitle;
+                // Update user properties (preserve existing values when fields are left empty)
+                if (!string.IsNullOrWhiteSpace(user.Name))
+                {
+                    existingUser.Name = user.Name;
+                }
+                if (!string.IsNullOrWhiteSpace(user.Email))
+                {
+                    existingUser.Email = user.Email;
+                }
+                // PhoneNamber is non-nullable int; only overwrite if a value was actually posted
+                if (Request.HasFormContentType && Request.Form.ContainsKey("PhoneNamber") && int.TryParse(Request.Form["PhoneNamber"], out var phone))
+                {
+                    existingUser.PhoneNamber = phone;
+                }
+                if (!string.IsNullOrWhiteSpace(user.JobTitle))
+                {
+                    existingUser.JobTitle = user.JobTitle;
+                }
 
                 _context.SaveChanges();
 
-                TempData["SuccessMessage"] = "تم تحديث البيانات بنجاح";
+                var isArabic = HttpContext.Session.GetString("lang") == "ar";
+                TempData["SuccessMessage"] = isArabic ? "تم تحديث البيانات بنجاح" : "Profile updated successfully";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error updating profile: {ex.Message}");
                 ModelState.AddModelError("", "حدث خطأ أثناء تحديث البيانات");
+                
+                // Get the current user data to populate the form
+                var currentUser = _context.Users.FirstOrDefault(u => u.Id == user.Id);
+                if (currentUser != null)
+                {
+                    user.UserName = currentUser.UserName;
+                    user.Password = currentUser.Password;
+                    user.Role = currentUser.Role;
+                    user.ProfileImage = currentUser.ProfileImage;
+                }
                 return View("Index", user);
             }
         }

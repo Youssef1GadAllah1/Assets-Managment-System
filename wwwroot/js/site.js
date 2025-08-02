@@ -36,43 +36,48 @@ const reportTemplates = [
     }
 ];
 
-// Function to add new report
-document.querySelector('.add-report-btn').addEventListener('click', function () {
-    // Get a random report template
-    const template = reportTemplates[Math.floor(Math.random() * reportTemplates.length)];
+// Function to add new report - only if the button exists and we're on the reports page
+const addReportBtn = document.querySelector('.add-report-btn');
+if (addReportBtn && addReportBtn.tagName === 'BUTTON') {
+    addReportBtn.addEventListener('click', function () {
+        // Get a random report template
+        const template = reportTemplates[Math.floor(Math.random() * reportTemplates.length)];
 
-    // Create new report card
-    const reportCard = document.createElement('div');
-    reportCard.className = 'report-card';
-    reportCard.innerHTML = `
-        <div class="report-header">
-            <div class="report-title">${template.title}</div>
-            <div class="report-date">${template.date}</div>
-            <div class="report-author">
-                <div class="author-dot" style="background-color: ${template.authorColor};"></div>
-                <span>${template.author}</span>
+        // Create new report card
+        const reportCard = document.createElement('div');
+        reportCard.className = 'report-card';
+        reportCard.innerHTML = `
+            <div class="report-header">
+                <div class="report-title">${template.title}</div>
+                <div class="report-date">${template.date}</div>
+                <div class="report-author">
+                    <div class="author-dot" style="background-color: ${template.authorColor};"></div>
+                    <span>${template.author}</span>
+                </div>
             </div>
-        </div>
-        <div class="report-content">
-            ${template.content}
-        </div>
-    `;
+            <div class="report-content">
+                ${template.content}
+            </div>
+        `;
 
-    // Add animation
-    reportCard.style.opacity = '0';
-    reportCard.style.transform = 'translateY(20px)';
-    reportCard.style.transition = 'all 0.3s ease';
+        // Add animation
+        reportCard.style.opacity = '0';
+        reportCard.style.transform = 'translateY(20px)';
+        reportCard.style.transition = 'all 0.3s ease';
 
-    // Insert at the beginning
-    const reportsContainer = document.querySelector('.reports-container');
-    reportsContainer.insertBefore(reportCard, reportsContainer.firstChild);
+        // Insert at the beginning
+        const reportsContainer = document.querySelector('.reports-container');
+        if (reportsContainer) {
+            reportsContainer.insertBefore(reportCard, reportsContainer.firstChild);
 
-    // Trigger animation
-    setTimeout(() => {
-        reportCard.style.opacity = '1';
-        reportCard.style.transform = 'translateY(0)';
-    }, 10);
-});
+            // Trigger animation
+            setTimeout(() => {
+                reportCard.style.opacity = '1';
+                reportCard.style.transform = 'translateY(0)';
+            }, 10);
+        }
+    });
+}
 
 // Add interactivity when DOM is fully loaded
 document.addEventListener('DOMContentLoaded', function () {
@@ -176,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const navbarAvatar = document.getElementById('navbarAvatar');
 
     // Add event listener for file input changes (profile photo upload)
-    fileInput.addEventListener('change', function (event) {
+    if (fileInput) fileInput.addEventListener('change', function (event) {
         const file = event.target.files[0];
         if (file) {
             // Check if the file is an image
@@ -201,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 userData.profilePhoto = e.target.result;
 
                 // Update the navbar avatar if there's a photo
-                navbarAvatar.innerHTML = `<img src="${e.target.result}" alt="Profile" class="w-100 h-100 rounded-circle">`;
+                if (navbarAvatar) navbarAvatar.innerHTML = `<img src="${e.target.result}" alt="Profile" class="w-100 h-100 rounded-circle">`;
             };
             reader.readAsDataURL(file);
         }
@@ -224,28 +229,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Add event listener for form submission
-    profileForm.addEventListener('submit', function (event) {
-        event.preventDefault();
+    // Add event listener for form submission - allow server-side processing
+    if (profileForm) {
+        profileForm.addEventListener('submit', function (event) {
+            // Allow the form to submit to the server
+            // The server will handle the form processing
+            
+            // Update user data from form inputs for display purposes
+            userData.email = document.getElementById('email').value;
+            userData.phone = document.getElementById('phoneNumber').value;
+            userData.language = document.getElementById('language').value;
+            userData.twoFactorAuth = document.getElementById('twoFactorAuth').value;
+            userData.notifications = document.getElementById('notifications').value;
+            userData.dataSharing = document.getElementById('dataSharing').value;
 
-        // Update user data from form inputs
-        userData.email = document.getElementById('email').value;
-        userData.phone = document.getElementById('phoneNumber').value;
-        userData.language = document.getElementById('language').value;
-        userData.twoFactorAuth = document.getElementById('twoFactorAuth').value;
-        userData.notifications = document.getElementById('notifications').value;
-        userData.dataSharing = document.getElementById('dataSharing').value;
-
-        // Save the user data (in a real application, this would be sent to a server)
-        console.log('User data saved:', userData);
-
-        // Show success message
-        alert('Profile updated successfully!');
-
-        // In a real application, you would send this data to your server
-        // For example:
-        // saveUserDataToServer(userData);
-    });
+            console.log('Form submitted with data:', userData);
+        });
+    }
 
     // Add event listeners for sidebar navigation
     document.querySelectorAll('.sidebar-item').forEach(item => {

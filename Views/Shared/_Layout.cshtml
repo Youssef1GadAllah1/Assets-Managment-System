@@ -35,8 +35,16 @@
                         <i class="fas fa-bars fa-lg"></i>
                     </div>
                     <div class="search-bar position-relative">
+                        @{ 
+                            var lang = Context.Session.GetString("lang");
+                            var isArabicLang = lang == "ar";
+                            var searchPlaceholder = isArabicLang 
+                                ? "ابحث عن الأصول، المنتجات، الموظفين..." 
+                                : "Search assets, products, employees...";
+                            var inputDir = isArabicLang ? "rtl" : "ltr";
+                        }
                         <i class="fas fa-search position-absolute" style="left: 10px; top: 50%; transform: translateY(-50%); color: #6366f1;"></i>
-                        <input type="text" class="form-control ps-5" id="globalSearch" placeholder="البحث في الأصول، المنتجات، الموظفين..." style="border-radius: 20px; min-width: 300px;">
+                        <input type="text" class="form-control ps-5" id="globalSearch" placeholder="@searchPlaceholder" dir="@inputDir" style="border-radius: 20px; min-width: 300px;">
                         <div id="searchResults" class="position-absolute w-100 bg-white border rounded shadow-sm" style="top: 100%; left: 0; z-index: 1000; display: none; max-height: 400px; overflow-y: auto;"></div>
                     </div>
                 </div>
@@ -52,19 +60,28 @@
                         </button>
                     </div>
                     <div class="notification-badge position-relative">
+                        @{ var uname = Context.Session.GetString("UserName"); }
                         <a href="/Notification/Index" class="text-decoration-none position-relative">
                             <i class="fas fa-bell fa-lg"></i>
-                            <span class="badge bg-danger position-absolute top-0 start-100 translate-middle p-1 rounded-circle">2</span>
+                            <span class="badge bg-danger position-absolute top-0 start-100 translate-middle p-1 rounded-circle" id="notifCount" style="display:none">0</span>
                         </a>
                     </div>
                     <div class="dropdown">
                         <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="user-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px; font-size: 1.2rem;">
+                            <div class="user-avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2 overflow-hidden" id="navbarAvatar" style="width: 40px; height: 40px; font-size: 1.2rem;">
                                 @{
                                     var userName = Context.Session.GetString("Name");
+                                    var profileImg = Context.Session.GetString("ProfileImage");
                                     var displayChar = !string.IsNullOrEmpty(userName) ? userName.Substring(0, 1).ToUpper() : "U";
                                 }
-                                @displayChar
+                                @if (!string.IsNullOrEmpty(profileImg))
+                                {
+                                    <img src="@profileImg" alt="Profile" class="w-100 h-100 rounded-circle" />
+                                }
+                                else
+                                {
+                                    @displayChar
+                                }
                             </div>
                             <div class="user-info text-start">
                                 <div class="fw-bold">@(Context.Session.GetString("Name") ?? "User")</div>
@@ -104,9 +121,10 @@
                         
                         @if (!ViewData.ModelState.IsValid)
                         {
+                            var isArabic = Context.Session.GetString("lang") == "ar";
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                                 <i class="fas fa-exclamation-triangle me-2"></i>
-                                يرجى تصحيح الأخطاء التالية:
+                                @(isArabic ? "يرجى تصحيح الأخطاء التالية:" : "Please correct the following errors:")
                                 <ul class="mb-0 mt-2">
                                     @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
                                     {
@@ -367,186 +385,17 @@ document.addEventListener('DOMContentLoaded', function() {
             themeToggle.querySelector('i').className = 'fas fa-moon';
         }
     }
+    // Fetch unread notification count
+    fetch('/Search/Count', { method: 'GET' }).catch(()=>{});
+    fetch('/Notification/Index', { method: 'GET' }).then(r=>r.text()).then(()=>{
+        // This just ensures session is present; actual count is fetched below
+    });
+    fetch('/api/notifications/unread-count').then(r=>r.json()).then(d=>{
+        const el = document.getElementById('notifCount');
+        if (!el) return;
+        const count = d && typeof d.count === 'number' ? d.count : 0;
+        el.textContent = count;
+        el.style.display = count > 0 ? 'inline-block' : 'none';
+    }).catch(()=>{});
 });
 </script>
-<style>
-body.dark-mode {
-    background: #0f0f0f !important;
-    color: #e0e0e0 !important;
-}
-body.dark-mode .main-content, body.dark-mode .top-navbar {
-    background: #1a1a1a !important;
-    color: #e0e0e0 !important;
-}
-body.dark-mode .sidebar {
-    background: #1a1a1a !important;
-    border-right: 1px solid #333 !important;
-}
-body.dark-mode .sidebar-menu .sidebar-item {
-    color: #ccc !important;
-}
-body.dark-mode .sidebar-menu .sidebar-item.active, body.dark-mode .sidebar-menu .sidebar-item:hover {
-    background: #2a2a2a !important;
-    color: #fff !important;
-    border-left: 4px solid #6366f1 !important;
-}
-body.dark-mode .logo-container {
-    color: #fff !important;
-    border-bottom: 1px solid #333 !important;
-}
-body.dark-mode .search-bar, body.dark-mode .form-control, body.dark-mode .form-select {
-    background: #2a2a2a !important;
-    color: #fff !important;
-    border-color: #444 !important;
-}
-body.dark-mode .login-container, body.dark-mode .report-card, body.dark-mode .employee-list, body.dark-mode .asset-card, body.dark-mode .form-container {
-    background: #1a1a1a !important;
-    color: #fff !important;
-    box-shadow: 0 4px 32px rgba(0,0,0,0.8);
-}
-body.dark-mode .btn-primary {
-    background: #6366f1;
-    border: none;
-}
-body.dark-mode .btn-primary:hover {
-    background: #4f46e5;
-}
-body.dark-mode .dropdown-menu {
-    background: #2a2a2a !important;
-    color: #fff !important;
-}
-body.dark-mode .dropdown-item {
-    color: #fff !important;
-}
-body.dark-mode .dropdown-item:hover {
-    background: #3a3a3a !important;
-    color: #fff !important;
-}
-body.dark-mode .badge {
-    background: #6366f1 !important;
-    color: #fff !important;
-}
-/* ألوان الأرقام والكروت */
-body.dark-mode .stat-card, body.dark-mode .card {
-    background: #1a1a1a !important;
-    color: #fff !important;
-    border: 1px solid #333 !important;
-}
-body.dark-mode .fs-3, body.dark-mode .text-3xl {
-    color: #6366f1 !important;
-}
-body.dark-mode .fw-bold {
-    color: #fff !important;
-}
-body.dark-mode .text-muted {
-    color: #aaa !important;
-}
-/* ألوان الجداول */
-body.dark-mode table {
-    background: #1a1a1a !important;
-    color: #fff !important;
-}
-body.dark-mode .table {
-    color: #fff !important;
-}
-body.dark-mode .table th {
-    background: #2a2a2a !important;
-    color: #fff !important;
-    border-color: #444 !important;
-}
-body.dark-mode .table td {
-    border-color: #333 !important;
-    color: #fff !important;
-}
-body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
-    background-color: #2a2a2a !important;
-}
-/* ألوان الكروت الإحصائية */
-body.dark-mode .bg-blue-50 {
-    background: #1e3a8a !important;
-    color: #fff !important;
-}
-body.dark-mode .bg-red-50 {
-    background: #7f1d1d !important;
-    color: #fff !important;
-}
-body.dark-mode .bg-yellow-50 {
-    background: #78350f !important;
-    color: #fff !important;
-}
-body.dark-mode .bg-green-50 {
-    background: #14532d !important;
-    color: #fff !important;
-}
-body.dark-mode .text-blue-600, body.dark-mode .text-blue-800 {
-    color: #60a5fa !important;
-}
-body.dark-mode .text-red-600, body.dark-mode .text-red-800 {
-    color: #f87171 !important;
-}
-body.dark-mode .text-yellow-600, body.dark-mode .text-yellow-800 {
-    color: #fbbf24 !important;
-}
-body.dark-mode .text-green-600, body.dark-mode .text-green-800 {
-    color: #4ade80 !important;
-}
-/* ألوان النصوص */
-body.dark-mode .text-gray-600 {
-    color: #aaa !important;
-}
-body.dark-mode .text-gray-800 {
-    color: #e0e0e0 !important;
-}
-body.dark-mode .text-gray-500 {
-    color: #888 !important;
-}
-/* ألوان الخلفيات */
-body.dark-mode .bg-white {
-    background: #1a1a1a !important;
-}
-body.dark-mode .bg-gray-50 {
-    background: #0f0f0f !important;
-}
-/* ألوان الأزرار */
-body.dark-mode .btn-outline-secondary {
-    background: #2a2a2a !important;
-    border-color: #444 !important;
-    color: #fff !important;
-}
-body.dark-mode .btn-outline-secondary:hover {
-    background: #3a3a3a !important;
-    color: #fff !important;
-}
-/* ألوان النوافذ المنبثقة */
-body.dark-mode .modal-content {
-    background: #1a1a1a !important;
-    color: #fff !important;
-}
-body.dark-mode .modal-header {
-    border-bottom: 1px solid #333 !important;
-}
-body.dark-mode .modal-footer {
-    border-top: 1px solid #333 !important;
-}
-/* ألوان التنبيهات */
-body.dark-mode .alert-danger {
-    background: #7f1d1d !important;
-    color: #f87171 !important;
-    border-color: #dc2626 !important;
-}
-body.dark-mode .alert-success {
-    background: #14532d !important;
-    color: #4ade80 !important;
-    border-color: #16a34a !important;
-}
-body.dark-mode .alert-warning {
-    background: #78350f !important;
-    color: #fbbf24 !important;
-    border-color: #d97706 !important;
-}
-body.dark-mode .alert-info {
-    background: #1e3a8a !important;
-    color: #60a5fa !important;
-    border-color: #2563eb !important;
-}
-</style>
