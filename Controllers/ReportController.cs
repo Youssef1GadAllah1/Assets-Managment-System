@@ -82,7 +82,7 @@ namespace Capstone_Next_Step.Controllers
                 var user = _appDbContext.Users.FirstOrDefault(u => u.Id == report.CreatedById);
                 if (user == null)
                 {
-                    ModelState.AddModelError("CreatedById", "يرجى اختيار مستخدم صحيح");
+                    ModelState.AddModelError("CreatedById", "Please select a valid user");
                     var users = _appDbContext.Users.ToList();
                     var assets = _appDbContext.Assets.ToList();
                     ViewBag.Users = users;
@@ -94,7 +94,7 @@ namespace Capstone_Next_Step.Controllers
                 var asset = _appDbContext.Assets.FirstOrDefault(a => a.Id == report.AssetId);
                 if (asset == null)
                 {
-                    ModelState.AddModelError("AssetId", "يرجى اختيار أصل صحيح");
+                    ModelState.AddModelError("AssetId", "Please select a valid origin.");
                     var users = _appDbContext.Users.ToList();
                     var assets = _appDbContext.Assets.ToList();
                     ViewBag.Users = users;
@@ -105,13 +105,13 @@ namespace Capstone_Next_Step.Controllers
                 _appDbContext.Reports.Add(report);
                 _appDbContext.SaveChanges();
 
-                TempData["SuccessMessage"] = "تم إضافة التقرير بنجاح!";
+                TempData["SuccessMessage"] = "Report added successfully!";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error adding report: {ex.Message}");
-                ModelState.AddModelError("", "حدث خطأ أثناء إضافة التقرير");
+                ModelState.AddModelError("", "An error occurred while adding the report.");
                 return View("AddReport", report);
             }
         }

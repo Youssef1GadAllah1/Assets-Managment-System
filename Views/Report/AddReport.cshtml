@@ -4,7 +4,7 @@
     @if (!ViewData.ModelState.IsValid)
     {
         <div class="alert alert-danger">
-            <h6>يرجى تصحيح الأخطاء التالية:</h6>
+            <h6>Please correct the following errors:</h6>
             <ul class="mb-0">
                 @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
                 {
@@ -41,7 +41,7 @@
         <div class="mb-3">
             <label for="assetIdSelect" class="form-label">Asset</label>
             <select name="AssetId" class="form-select" id="assetIdSelect" required>
-                <option value="" selected disabled>اختر الأصل</option>
+                <option value="" selected disabled>choose asset</option>
                 @if (ViewBag.Assets != null)
                 {
                     @foreach (var asset in ViewBag.Assets)
