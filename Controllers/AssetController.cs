@@ -83,7 +83,7 @@ namespace Capstone_Next_Step.Controllers
                 // Validate required fields
                 if (string.IsNullOrEmpty(asset.Name))
                 {
-                    ModelState.AddModelError("Name", "اسم الأصل مطلوب");
+                    ModelState.AddModelError("Name", "Asset name required");
                     var users = _context.Users.ToList();
                     ViewBag.Users = users;
                     return View("AddAsset", asset);
@@ -91,7 +91,7 @@ namespace Capstone_Next_Step.Controllers
 
                 if (string.IsNullOrEmpty(asset.Category))
                 {
-                    ModelState.AddModelError("Category", "فئة الأصل مطلوبة");
+                    ModelState.AddModelError("Category", "Asset category required");
                     var users = _context.Users.ToList();
                     ViewBag.Users = users;
                     return View("AddAsset", asset);
@@ -99,7 +99,7 @@ namespace Capstone_Next_Step.Controllers
 
                 if (string.IsNullOrEmpty(asset.Type))
                 {
-                    ModelState.AddModelError("Type", "نوع الأصل مطلوب");
+                    ModelState.AddModelError("Type", "Asset type required");
                     var users = _context.Users.ToList();
                     ViewBag.Users = users;
                     return View("AddAsset", asset);
@@ -107,7 +107,7 @@ namespace Capstone_Next_Step.Controllers
 
                 if (string.IsNullOrEmpty(asset.Color))
                 {
-                    ModelState.AddModelError("Color", "لون الأصل مطلوب");
+                    ModelState.AddModelError("Color", "Asset color required");
                     var users = _context.Users.ToList();
                     ViewBag.Users = users;
                     return View("AddAsset", asset);
@@ -115,7 +115,7 @@ namespace Capstone_Next_Step.Controllers
 
                 if (string.IsNullOrEmpty(asset.Location))
                 {
-                    ModelState.AddModelError("Location", "موقع الأصل مطلوب");
+                    ModelState.AddModelError("Location", "Asset site required");
                     var users = _context.Users.ToList();
                     ViewBag.Users = users;
                     return View("AddAsset", asset);
@@ -123,7 +123,7 @@ namespace Capstone_Next_Step.Controllers
 
                 if (string.IsNullOrEmpty(asset.Status))
                 {
-                    ModelState.AddModelError("Status", "حالة الأصل مطلوبة");
+                    ModelState.AddModelError("Status", "Asset status required");
                     var users = _context.Users.ToList();
                     ViewBag.Users = users;
                     return View("AddAsset", asset);
@@ -133,7 +133,7 @@ namespace Capstone_Next_Step.Controllers
                 var user = _context.Users.FirstOrDefault(u => u.Id == asset.UserId);
                 if (user == null)
                 {
-                    ModelState.AddModelError("UserId", "يرجى اختيار مستخدم صحيح");
+                    ModelState.AddModelError("UserId", "Please select a valid user");
                     var users = _context.Users.ToList();
                     ViewBag.Users = users;
                     return View("AddAsset", asset);
@@ -148,13 +148,13 @@ namespace Capstone_Next_Step.Controllers
                 _context.Assets.Add(asset);
                 _context.SaveChanges();
 
-                TempData["SuccessMessage"] = "تم إضافة الأصل بنجاح!";
+                TempData["SuccessMessage"] = "The Asset has been added successfully!";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error adding asset: {ex.Message}");
-                ModelState.AddModelError("", "حدث خطأ أثناء إضافة الأصل");
+                ModelState.AddModelError("", "An error occurred while adding the Asset.");
                 return View("AddAsset", asset);
             }
         }
@@ -203,13 +203,13 @@ namespace Capstone_Next_Step.Controllers
                 _context.Products.Add(product);
                 _context.SaveChanges();
 
-                TempData["SuccessMessage"] = "تم إضافة المنتج بنجاح";
+                TempData["SuccessMessage"] = "The product has been added successfully.";
                 return RedirectToAction("Inventory");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error adding product: {ex.Message}");
-                ModelState.AddModelError("", "حدث خطأ أثناء إضافة المنتج");
+                ModelState.AddModelError("", "An error occurred while adding the product.");
                 return View("AddProduct", product);
             }
         }

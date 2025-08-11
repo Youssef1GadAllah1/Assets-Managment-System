@@ -7,22 +7,22 @@ namespace Capstone_Next_Step.Models
     {
 
         public int Id { get; set; } 
-        [Required(ErrorMessage = "اسم الأصل مطلوب")]
+        [Required(ErrorMessage = "Asset name required")]
         public string Name { get; set; }
-        [Required(ErrorMessage = "فئة الأصل مطلوبة")]
+        [Required(ErrorMessage = "Asset category required")]
         public string Category { get; set; }
         public DateTime date { get; set; } = DateTime.Now;
-        [Required(ErrorMessage = "نوع الأصل مطلوب")]
+        [Required(ErrorMessage = "Asset type required")]
         public string Type { get; set; }
         public int Price { get; set; }
-        [Required(ErrorMessage = "لون الأصل مطلوب")]
+        [Required(ErrorMessage = "Asset color required")]
         public string Color { get; set; }
-        [Required(ErrorMessage = "موقع الأصل مطلوب")]
+        [Required(ErrorMessage = "Asset site required")]
         public string Location { get; set; }
-        [Required(ErrorMessage = "حالة الأصل مطلوبة")]
+        [Required(ErrorMessage = "Asset status required")]
         public string Status { get; set; }
         public string? ImageUrl { get; set; }
-        [Required(ErrorMessage = "يرجى اختيار مستخدم")]
+        [Required(ErrorMessage = "Please select a user")]
         [ForeignKey("User")]
         public int UserId { get; set; }
     }

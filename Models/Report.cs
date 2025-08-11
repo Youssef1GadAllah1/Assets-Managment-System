@@ -6,22 +6,22 @@ namespace Capstone_Next_Step.Models
     public class Report
     {
         public int Id { get; set; }
-        [Required(ErrorMessage = "عنوان التقرير مطلوب")]
+        [Required(ErrorMessage = "Report title required")]
         public string Title { get; set; }
-        [Required(ErrorMessage = "وصف التقرير مطلوب")]
+        [Required(ErrorMessage = "Report description required")]
         public string Description { get; set; }
-        [Required(ErrorMessage = "اسم المؤلف مطلوب")]
+        [Required(ErrorMessage = "Author name required")]
         public string Author { get; set; }
         public DateTime Created { get; set; } = DateTime.Now;
-        [Required(ErrorMessage = "محتوى التقرير مطلوب")]
+        [Required(ErrorMessage = "Report content is required")]
         public string ReportContant { get; set; }
-        [Required(ErrorMessage = "يرجى اختيار مستخدم")]
+        [Required(ErrorMessage = "Please select a user")]
         [ForeignKey("User")]
         public int CreatedById { get; set; }
         public User User { get; set; }
 
         // Foreign key for the associated asset
-        [Required(ErrorMessage = "يرجى اختيار أصل")]
+        [Required(ErrorMessage = "Please select an Asset")]
         [ForeignKey("Asset")]
         public int AssetId { get; set; }
         public Asset Asset { get; set; }

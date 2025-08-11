@@ -29,7 +29,7 @@ namespace Capstone_Next_Step.Controllers
             {
                 if (string.IsNullOrEmpty(UserNameInput) || string.IsNullOrEmpty(PasswordInput))
                 {
-                    ViewBag.Error = "يرجى إدخال اسم المستخدم وكلمة المرور";
+                    ViewBag.Error = "Please enter your username and password.";
                     return View("AdminLogin");
                 }
 
@@ -39,7 +39,7 @@ namespace Capstone_Next_Step.Controllers
 
                 if (admin == null)
                 {
-                    ViewBag.Error = "اسم المستخدم أو كلمة المرور غير صحيحة";
+                    ViewBag.Error = "Incorrect username or password";
                     return View("AdminLogin");
                 }
 
@@ -53,7 +53,7 @@ namespace Capstone_Next_Step.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"Admin login error: {ex.Message}");
-                ViewBag.Error = "حدث خطأ أثناء تسجيل الدخول";
+                ViewBag.Error = "An error occurred while logging in.";
                 return View("AdminLogin");
             }
         }
@@ -65,7 +65,7 @@ namespace Capstone_Next_Step.Controllers
             {
                 if (string.IsNullOrEmpty(UserNameInput) || string.IsNullOrEmpty(PasswordInput))
                 {
-                    ViewBag.Error = "يرجى إدخال اسم المستخدم وكلمة المرور";
+                    ViewBag.Error = "Please enter your username and password.";
                     return View("Login");
                 }
 
@@ -75,7 +75,7 @@ namespace Capstone_Next_Step.Controllers
 
                 if (user == null)
                 {
-                    ViewBag.Error = "اسم المستخدم أو كلمة المرور غير صحيحة";
+                    ViewBag.Error = "Incorrect username or password";
                     return View("Login");
                 }
 
@@ -89,7 +89,7 @@ namespace Capstone_Next_Step.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"User login error: {ex.Message}");
-                ViewBag.Error = "حدث خطأ أثناء تسجيل الدخول";
+                ViewBag.Error = "An error occurred while logging in.";
                 return View("Login");
             }
         }
