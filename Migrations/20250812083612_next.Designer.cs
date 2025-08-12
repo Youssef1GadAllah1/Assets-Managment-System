@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Capstone_Next_Step.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250811102641_next-step")]
-    partial class nextstep
+    [Migration("20250812083612_next")]
+    partial class next
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

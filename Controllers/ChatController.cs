@@ -1,18 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Capstone_Next_Step.Data;
 using Capstone_Next_Step.Models;
+using System;
+using System.Linq;
 
 namespace Capstone_Next_Step.Controllers
 {
     public class ChatController : Controller
     {
         private readonly AppDbContext _context;
-        
+
         public ChatController(AppDbContext context)
         {
             _context = context;
         }
-        
+
         public IActionResult Index()
         {
             return View();
@@ -24,79 +26,76 @@ namespace Capstone_Next_Step.Controllers
             try
             {
                 var raw = request.Message ?? string.Empty;
-                string userMessage = raw.ToLower();
+                string userMessage = raw.ToLower().Trim();
                 string botResponse;
 
-                // Validate input
                 if (string.IsNullOrWhiteSpace(userMessage))
                 {
-                    botResponse = "يرجى كتابة رسالتك";
+                    botResponse = "Please type your message.";
                 }
-                else if (userMessage.Contains("hello") || userMessage.Contains("hi") || userMessage.Contains("مرحبا"))
+                else if (userMessage.Contains("hello") || userMessage.Contains("hi"))
                 {
-                    botResponse = "مرحباً! كيف يمكنني مساعدتك اليوم؟";
+                    botResponse = "Hello! How can I help you today?";
                 }
-                else if (userMessage.Contains("how are you") || userMessage.Contains("عامل ايه") || userMessage.Contains("اخبارك"))
+                else if (userMessage.Contains("how are you"))
                 {
-                    botResponse = "أنا بخير، شكراً لك! كيف يمكنني مساعدتك في إدارة الأصول؟";
+                    botResponse = "I'm doing great, thank you! How can I assist you with asset management?";
                 }
-                else if (userMessage.Contains("problem") || userMessage.Contains("مشكلة"))
+                else if (userMessage.Contains("problem") || userMessage.Contains("issue"))
                 {
-                    botResponse = "أعتذر لسماع أن لديك مشكلة. هل يمكنك وصفها بالتفصيل؟";
+                    botResponse = "Sorry to hear you have an issue. Can you describe it in detail?";
                 }
-                else if (userMessage.Contains("thanks") || userMessage.Contains("شكرا"))
+                else if (userMessage.Contains("thanks") || userMessage.Contains("thank you"))
                 {
-                    botResponse = "العفو! إذا احتجت أي شيء آخر، لا تتردد في السؤال.";
+                    botResponse = "You're welcome! If you need anything else, feel free to ask.";
                 }
-                else if (userMessage.Contains("who are you") || userMessage.Contains("انت مين"))
+                else if (userMessage.Contains("who are you"))
                 {
-                    botResponse = "أنا المساعد الذكي لنظام إدارة الأصول. اسألني أي شيء عن النظام أو أصولك!";
+                    botResponse = "I'm the smart assistant for the Asset Management System. Ask me anything about the system or your assets!";
                 }
-                else if (userMessage.Contains("time") || userMessage.Contains("الساعة"))
+                else if (userMessage.Contains("time"))
                 {
-                    botResponse = $"الوقت الحالي: {DateTime.Now.ToString("HH:mm:ss")}";
+                    botResponse = $"Current time: {DateTime.Now:HH:mm:ss}";
                 }
-                else if (userMessage.Contains("date") || userMessage.Contains("التاريخ"))
+                else if (userMessage.Contains("date"))
                 {
-                    botResponse = $"التاريخ الحالي: {DateTime.Now.ToString("dd/MM/yyyy")}";
+                    botResponse = $"Today's date: {DateTime.Now:dd/MM/yyyy}";
                 }
-                else if (userMessage.Contains("asset") || userMessage.Contains("أصل") || userMessage.Contains("أصول"))
+                else if (userMessage.Contains("asset") || userMessage.Contains("assets"))
                 {
-                    botResponse = "يمكنك إدارة الأصول من خلال صفحة الأصول. هناك يمكنك إضافة وتعديل وحذف الأصول.";
+                    botResponse = "You can manage assets from the Assets page, where you can add, edit, and delete them.";
                 }
-                else if (userMessage.Contains("report") || userMessage.Contains("تقرير") || userMessage.Contains("تقارير"))
+                else if (userMessage.Contains("report") || userMessage.Contains("reports"))
                 {
-                    botResponse = "يمكنك إنشاء وعرض التقارير من صفحة التقارير. هناك يمكنك إضافة تقارير جديدة.";
+                    botResponse = "You can create and view reports from the Reports page.";
                 }
-                else if (userMessage.Contains("user") || userMessage.Contains("مستخدم") || userMessage.Contains("موظف"))
+                else if (userMessage.Contains("user") || userMessage.Contains("employee"))
                 {
-                    botResponse = "يمكنك إدارة المستخدمين والموظفين من صفحة الموظفين.";
+                    botResponse = "You can manage users and employees from the Employees page.";
                 }
                 else
                 {
-                    // Simple multilingual fallback using keyword intents
-                    // Try to detect common intents dynamically
-                    if (userMessage.Contains("help") || userMessage.Contains("مساعدة") || userMessage.Contains("ازاي"))
+                    if (userMessage.Contains("help"))
                     {
-                        botResponse = "I can help with assets, reports, and users. يمكنك سؤالي عن الأصول، التقارير والمستخدمين.";
+                        botResponse = "I can help with assets, reports, and users. Try asking about any of these.";
                     }
-                    else if (userMessage.Contains("where") && (userMessage.Contains("report") || userMessage.Contains("تقرير")))
+                    else if (userMessage.Contains("where") && userMessage.Contains("report"))
                     {
-                        botResponse = "Open Reports page to add or view reports. افتح صفحة التقارير لإضافة أو عرض التقارير.";
+                        botResponse = "Go to the Reports page to add or view reports.";
                     }
-                    else if (userMessage.Contains("password") || userMessage.Contains("باسورد") || userMessage.Contains("كلمة السر"))
+                    else if (userMessage.Contains("password"))
                     {
-                        botResponse = "Password changes are handled by admin for now. تغيير كلمة السر من خلال المشرف حالياً.";
+                        botResponse = "Password changes are currently handled by the administrator.";
                     }
                     else
                     {
-                        // Echo back with a generic helpful response (English + Arabic)
-                        botResponse = $"You said: '{raw}'. I'm learning. Ask me about assets, reports, users or help. قلت: '{raw}'. ما زلت أتعلم، اسألني عن الأصول أو التقارير أو المستخدمين أو اكتب 'help / مساعدة'.";
+                        botResponse = $"You said: '{raw}'. I'm still learning. Ask me about assets, reports, users, or type 'help'.";
                     }
                 }
 
-                return Json(new { 
-                    success = true, 
+                return Json(new
+                {
+                    success = true,
                     response = botResponse,
                     timestamp = DateTime.Now.ToString("HH:mm:ss")
                 });
@@ -104,9 +103,10 @@ namespace Capstone_Next_Step.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine($"Chat error: {ex.Message}");
-                return Json(new { 
-                    success = false, 
-                    response = "عذراً، حدث خطأ في معالجة رسالتك",
+                return Json(new
+                {
+                    success = false,
+                    response = "Sorry, an error occurred while processing your message.",
                     timestamp = DateTime.Now.ToString("HH:mm:ss")
                 });
             }
