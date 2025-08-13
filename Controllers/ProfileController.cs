@@ -9,12 +9,12 @@ namespace Capstone_Next_Step.Controllers
     public class ProfileController : Controller
     {
         private readonly AppDbContext _context;
-
+        
         public ProfileController(AppDbContext appDbContext)
         {
             _context = appDbContext;
         }
-
+        
         public IActionResult Index()
         {
             try
@@ -67,11 +67,12 @@ namespace Capstone_Next_Step.Controllers
         [HttpPost]
         public IActionResult UploadProfileImage(int id, IFormFile profileImage)
         {
+            var isArabic = HttpContext.Session.GetString("lang") == "ar";
             try
             {
                 if (profileImage == null || profileImage.Length == 0)
                 {
-                    TempData["ErrorMessage"] = "Please select an image.";
+                    TempData["ErrorMessage"] = isArabic ? "يرجى اختيار صورة" : "Please select an image";
                     return RedirectToAction("Details", new { id = id });
                 }
 
@@ -85,14 +86,14 @@ namespace Capstone_Next_Step.Controllers
                 var allowedTypes = new[] { "image/jpeg", "image/png", "image/gif" };
                 if (!allowedTypes.Contains(profileImage.ContentType.ToLower()))
                 {
-                    TempData["ErrorMessage"] = "Please select an image in JPG, PNG, or GIF format.";
+                    TempData["ErrorMessage"] = isArabic ? "يرجى اختيار صورة بصيغة JPG أو PNG أو GIF" : "Please select an image in JPG, PNG, or GIF format";
                     return RedirectToAction("Details", new { id = id });
                 }
 
                 // Validate file size (max 5MB)
                 if (profileImage.Length > 5 * 1024 * 1024)
                 {
-                    TempData["ErrorMessage"] = "Image size must be less than 5 MB.";
+                    TempData["ErrorMessage"] = isArabic ? "حجم الصورة يجب أن يكون أقل من 5 ميجابايت" : "Image size must be less than 5 MB";
                     return RedirectToAction("Details", new { id = id });
                 }
 
@@ -120,15 +121,14 @@ namespace Capstone_Next_Step.Controllers
                 // Update session so navbar can show the new photo
                 HttpContext.Session.SetString("ProfileImage", user.ProfileImage ?? string.Empty);
 
-                var isArabic = HttpContext.Session.GetString("lang") == "ar";
-                TempData["SuccessMessage"] = isArabic ? "Profile photo updated successfully" : "Profile photo updated successfully";
+                TempData["SuccessMessage"] = isArabic ? "تم تحديث صورة الملف الشخصي بنجاح" : "Profile photo updated successfully";
                 // redirect back to profile page to refresh avatar
                 return RedirectToAction("Index", "Profile");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error uploading profile image: {ex.Message}");
-                TempData["ErrorMessage"] = "An error occurred while uploading the image.";
+                TempData["ErrorMessage"] = isArabic ? "حدث خطأ أثناء رفع الصورة" : "An error occurred while uploading the image";
                 return RedirectToAction("Details", new { id = id });
             }
         }
@@ -136,6 +136,7 @@ namespace Capstone_Next_Step.Controllers
         [HttpPost]
         public IActionResult UpdateProfile(User user)
         {
+            var isArabic = HttpContext.Session.GetString("lang") == "ar";
             try
             {
                 // These fields are not part of the posted form; prevent automatic required validation
@@ -185,15 +186,14 @@ namespace Capstone_Next_Step.Controllers
 
                 _context.SaveChanges();
 
-                var isArabic = HttpContext.Session.GetString("lang") == "ar";
-                TempData["SuccessMessage"] = isArabic ? "Profile updated successfully" : "Profile updated successfully";
+                TempData["SuccessMessage"] = isArabic ? "تم تحديث البيانات بنجاح" : "Profile updated successfully";
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error updating profile: {ex.Message}");
-                ModelState.AddModelError("", "An error occurred while updating the data.");
-
+                ModelState.AddModelError("", isArabic ? "حدث خطأ أثناء تحديث البيانات" : "An error occurred while updating the data");
+                
                 // Get the current user data to populate the form
                 var currentUser = _context.Users.FirstOrDefault(u => u.Id == user.Id);
                 if (currentUser != null)
